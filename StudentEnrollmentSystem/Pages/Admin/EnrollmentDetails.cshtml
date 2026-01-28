@@ -1,0 +1,72 @@
+﻿@page "{studentID}"
+@model StudentEnrollmentSystem.Pages.Admin.EnrollmentDetailsModel
+@{
+    ViewData["Title"] = $"Enrollment Details for {Model.Student?.FullName ?? "Student"}";
+}
+
+<div class="container mt-5">
+    <h1 class="text-center">Enrollment Details for @Model.Student?.FullName (@Model.StudentID)</h1>
+
+    @if (Model.Student == null)
+    {
+        <p class="text-center text-danger">Student not found.</p>
+    }
+    else if (!Model.Enrollments.Any())
+    {
+        <p class="text-center">No enrollments found for this student.</p>
+    }
+    else
+    {
+        <div class="card mb-4">
+            <div class="card-header">Student Information</div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">Student ID</dt>
+                    <dd class="col-sm-9">@Model.Student.UserID</dd>
+                    <dt class="col-sm-3">Full Name</dt>
+                    <dd class="col-sm-9">@Model.Student.FullName</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Enrollment ID</th>
+                        <th>Course ID</th>
+                        <th>Course Name</th>
+                        <th>Major</th>
+                        <th>Day</th>
+                        <th>Time</th>
+                        <th>Credits</th>
+                        <th>Venue</th>
+                        <th>Lecturer</th>
+                        <th>Section</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var enrollment in Model.Enrollments)
+                    {
+                        <tr>
+                            <td>@enrollment.EnrollmentID</td>
+                            <td>@enrollment.CourseID</td>
+                            <td>@enrollment.Course.CourseName</td>
+                            <td>@enrollment.Course.Major</td>
+                            <td>@enrollment.Course.DayOfWeek</td>
+                            <td>@enrollment.Course.StartTime.ToString("hh\\:mm") - @enrollment.Course.EndTime.ToString("hh\\:mm")</td>
+                            <td>@enrollment.Course.CreditHours</td>
+                            <td>@enrollment.Course.Venue</td>
+                            <td>@enrollment.Course.Lecturer</td>
+                            <td>@enrollment.Course.Section</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <div class="text-center mt-4">
+        <a asp-page="/Admin/ViewEnrollments" class="btn btn-secondary">Back to Student List</a>
+    </div>
+</div>

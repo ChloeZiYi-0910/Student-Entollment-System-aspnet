@@ -1,0 +1,63 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-4">Register</h2>
+                <form method="post">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" asp-for="User.UserID">User ID</label>
+                        <input asp-for="User.UserID" class="form-control" required autofocus />
+                        <span asp-validation-for="User.UserID" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" asp-for="User.FullName">Full Name</label>
+                        <input asp-for="User.FullName" class="form-control" required />
+                        <span asp-validation-for="User.FullName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" asp-for="User.Password">Password</label>
+                        <input asp-for="User.Password" type="password" class="form-control" id="password" required />
+                        <span asp-validation-for="User.Password" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <input type="checkbox" id="toggle-password"> Show Password
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger">@Model.ErrorMessage</div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                    {
+                        <div class="alert alert-success">@Model.SuccessMessage</div>
+                    }
+                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                </form>
+                <div class="text-center mt-3">
+                    <p>Already have an account? <a asp-page="/Account/Login">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const passwordInput = document.getElementById('password');
+            const togglePasswordCheckbox = document.getElementById('toggle-password');
+
+            if (passwordInput && togglePasswordCheckbox) {
+                togglePasswordCheckbox.addEventListener('change', function () {
+                    passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+                });
+            }
+        });
+    </script>
+}

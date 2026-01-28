@@ -1,0 +1,168 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Admin.ManageStudentsModel
+@{
+    ViewData["Title"] = "Manage Students";
+}
+<link rel="stylesheet" href="~/css/admin-table.css" />
+<div class="container mt-3">
+    <h1 class="text-center">Manage Students</h1>
+    @if (TempData["Message"] != null)
+    {
+        <div id="alertMessage" class="alert alert-@TempData["MessageType"]" role="alert">
+            @TempData["Message"]
+        </div>
+    }
+    <!-- Add/Edit Student Form -->
+    <div class="card mb-4">
+        <div class="card-header bg-custom text-white">
+            @if (Model.IsEditMode)
+            {
+                <h4 class="mb-0">Edit Student</h4>
+            }
+            else
+            {
+                <h4 class="mb-0">Add New Student</h4>
+            }
+        </div>
+        <div class="card-body">
+            @if (Model.IsEditMode)
+            {
+                <form method="post" asp-page-handler="EditStudent">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">User ID</label>
+                            <input asp-for="NewStudent.UserID" type="text" class="form-control" readonly />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Student ID</label>
+                            <input asp-for="NewStudent.StudentID" type="text" class="form-control" readonly />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Program</label>
+                            <select class="form-select" asp-for="NewStudent.Program" required>
+                                <option value="">-- Select Major --</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Software Engineering">Software Engineering</option>
+                                <option value="Business Administration">Business Administration</option>
+                                <option value="Accounting">Accounting</option>
+                                <option value="Marketing">Marketing</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-4">
+                            <label class="form-label">Last Name</label>
+                            <input asp-for="NewStudent.LastName" type="text" class="form-control" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">First Name</label>
+                            <input asp-for="NewStudent.FirstName" type="text" class="form-control" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Password (Leave blank to keep current)</label>
+                            <input asp-for="NewStudent.Password" type="password" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mt-3">
+                        <button type="submit" formmethod="post" asp-page-handler="CancelEdit" class="btn btn-secondary px-3 me-2">Cancel</button>
+                        <button type="submit" class="btn btn-success px-3">Update Student</button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <form method="post" asp-page-handler="AddStudent">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">User ID</label>
+                            <input asp-for="NewStudent.UserID" type="text" class="form-control" required />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Student ID</label>
+                            <input asp-for="NewStudent.StudentID" type="text" class="form-control" required />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Program</label>
+                            <select class="form-select" asp-for="NewStudent.Program" required>
+                                <option value="">-- Select Major --</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Software Engineering">Software Engineering</option>
+                                <option value="Business Administration">Business Administration</option>
+                                <option value="Accounting">Accounting</option>
+                                <option value="Marketing">Marketing</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Last Name</label>
+                            <input asp-for="NewStudent.LastName" type="text" class="form-control" required />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">First Name</label>
+                            <input asp-for="NewStudent.FirstName" type="text" class="form-control" required />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Password</label>
+                            <input asp-for="NewStudent.Password" type="password" class="form-control" required />
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary px-3">Add Student</button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+
+    <!-- Student List -->
+    <div class="card mt-4">
+        <div class="card-header bg-custom text-white">
+            <h4 class="mb-0">All Students</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Full Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var student in Model.Students)
+                        {
+                            <tr>
+                                <td>@student.UserID</td>
+                                <td>@student.FullName</td>
+                                <td>
+                                    <a asp-page="./ManageStudents" asp-route-id="@student.UserID" class="btn btn-success btn-sm">Edit</a>
+                                    <form method="post" asp-page-handler="DeleteStudent" asp-route-id="@student.UserID" class="d-inline">
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this student?')">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-4">
+        <a asp-page="/Admin/AdminHome" class="btn btn-outline-primary">Back to Dashboard</a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-hide alert messages after 5 seconds
+        $(document).ready(function () {
+            setTimeout(function () {
+                $("#alertMessage").fadeOut("slow");
+            }, 5000);
+        });
+    </script>
+}

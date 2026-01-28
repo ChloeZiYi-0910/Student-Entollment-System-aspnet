@@ -1,0 +1,8 @@
+﻿thead tr.thead-custom th {
+    background-color: #dde6f4 !important;
+    color: #244373 !important;
+}
+
+.bg-custom {
+    background-color: var(--main-color) !important;
+}

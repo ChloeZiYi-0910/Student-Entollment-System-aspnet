@@ -1,0 +1,243 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Enquiry.TimetableMatchingModel
+@{
+    ViewData["Title"] = "Timetable Matching";
+
+    // Define time slots from 08:00 to 18:00
+    var timeSlots = Enumerable.Range(8, 11).Select(hour => $"{hour}:00").ToList();
+
+    // Define darker text colors for courses (max 6 different courses)
+    var colors = new[] { "#0056b3", "#1e7e34", "#a71d2a", "#c69500", "#117a8b", "#4a148c" };
+
+    // Assign colors to courses dynamically
+    var courseColors = new Dictionary<string, string>();
+    int colorIndex = 0;
+    var editingCourseId = TempData["EditingCourseID"] as string;
+}
+
+@section Styles {
+    <style>
+        @Html.Raw(System.IO.File.ReadAllText("wwwroot/css/Timetable.css"))
+
+        .match-course-section {
+            margin-bottom: 20px;
+        }
+
+        .matched-course {
+            background-color: #f8f9fa;
+            border-left: 4px solid #28a745;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+            .matched-course .course-title {
+                font-weight: bold;
+                color: #0056b3;
+            }
+
+            .matched-course .course-details {
+                font-size: 0.9rem;
+                color: #6c757d;
+            }
+
+        .add-course-form {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .matchedCourse {
+            background-color: rgba(40, 167, 69, 0.2);
+        }
+    </style>
+}
+
+<div class="container mt-4">
+    @if (Model.EnrolledCourses.Any())
+    {
+        <div class="card mb-4">
+            <div class="card-header bg-custom text-white">
+                <h4 class="mb-0">Timetable Preview & Course Matching</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> This page allows you to simulate adding courses to your timetable without affecting your actual enrollment.
+                </div>
+
+                <!-- Add Course Section -->
+                <div class="add-course-form">
+                    <h5><i class="fas fa-plus-circle"></i> Add Course to Preview</h5>
+                    <!-- Form for adding course (with validation) -->
+                    <form method="post" asp-page-handler="AddCourse">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <select class="form-select" asp-for="SelectedCourseID">
+                                    <option value="">-- Select Course --</option>
+                                    @foreach (var course in Model.AvailableCourses.OrderBy(c => c.CourseID))
+                                    {
+                                        <option value="@course.CourseID">
+                                            @course.CourseID - @course.CourseName (Section @course.Section) - @course.DayOfWeek
+                                            @course.StartTime.ToString(@"hh\:mm") - @course.EndTime.ToString(@"hh\:mm")
+                                        </option>
+                                    }
+                                </select>
+                                <span asp-validation-for="SelectedCourseID" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary">Add to Timetable</button>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(HttpContext.Session.GetString("ClashMessage")))
+                        {
+                            <div class="alert alert-danger mt-2" id="alertMessage">
+                                @HttpContext.Session.GetString("ClashMessage")
+                            </div>
+                        }
+                    </form>                 
+                </div>
+
+                <!-- Matched Courses Section -->
+                @if (Model.MatchedCourses != null && Model.MatchedCourses.Any())
+                {
+                    <div class="match-course-section">
+                        <h5><i class="fas fa-th-list"></i> Courses Added for Preview</h5>
+                        <div class="row">
+                            @foreach (var course in Model.MatchedCourses)
+                            {
+                                <div class="col-md-6">
+                                    <div class="matched-course">
+                                        <div class="course-title">@course.CourseID - @course.CourseName</div>
+                                        <div class="course-details">
+                                            <span><i class="fas fa-calendar-alt"></i> @course.DayOfWeek</span> •
+                                            <span><i class="fas fa-clock"></i> @course.StartTime.ToString(@"hh\:mm") - @course.EndTime.ToString(@"hh\:mm")</span> •
+                                            <span><i class="fas fa-map-marker-alt"></i> @course.Venue</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <form method="post" asp-page-handler="ClearMatched">
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-outline-secondary mt-2">Clear All</button>
+                        </div>
+                    </form>
+                }
+
+                <!-- Enrolled Courses Table -->
+                <h5><i class="fas fa-graduation-cap"></i> Currently Enrolled Courses</h5>
+                <table class="table table-hover">
+                    <thead>
+                        <tr class="thead-custom">
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>Section</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var course in Model.EnrolledCourses)
+                        {
+                            <tr>
+                                <td>@course.CourseID</td>
+                                <td>@course.CourseName</td>
+                                <td>@course.Section</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <h4 class="mb-3">Current Timetable (with Preview)</h4>
+            <table class="table timetable table-bordered text-center align-middle">
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        @foreach (var time in timeSlots)
+                        {
+                            <th>@time</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var day in Model.DaysOfWeek)
+                    {
+                        <tr>
+                            <th class="fw-bold day-header">@day.Substring(0, 3).ToUpper()</th> <!-- Show "Mon", "Tue", etc. -->
+                            @for (int hour = 8; hour <= 18;)
+                            {
+                                // First check enrolled courses
+                                var enrolledCourse = Model.EnrolledCourses
+                                .FirstOrDefault(c => c.DayOfWeek == day && c.StartTime.Hours == hour);
+
+                                // Then check matched courses
+                                var matchedCourse = Model.MatchedCourses != null ?
+                                Model.MatchedCourses.FirstOrDefault(c => c.DayOfWeek == day && c.StartTime.Hours == hour) : null;
+
+                                var course = enrolledCourse ?? matchedCourse;
+
+                                if (course != null)
+                                {
+                                    int duration = (int)(course.EndTime.TotalHours - course.StartTime.TotalHours);
+
+                                    // Assign text color if not already assigned
+                                    if (!courseColors.ContainsKey(course.CourseID))
+                                    {
+                                        courseColors[course.CourseID] = colors[colorIndex % colors.Length];
+                                        colorIndex++;
+                                    }
+
+                                    bool isMatchedCourse = matchedCourse != null && matchedCourse.CourseID == course.CourseID;
+
+                                    <td colspan="@duration" class="text-center @(isMatchedCourse ? "matchedCourse" : "")"
+                                        data-bs-toggle="popover"
+                                        data-bs-placement="right"
+                                        title="Course Details: @course.CourseID"
+                                        data-bs-content="Lecturer: @course.Lecturer
+                                                                             Venue: @course.Venue"
+                                        style="cursor: pointer;text-align: justify !important;">
+                                        <span style="color: @courseColors[course.CourseID]; font-weight: bold;">
+                                            @course.CourseID - @course.Venue<br />
+                                            @course.CourseName
+                                            @if (isMatchedCourse)
+                                            {
+                                                <small class="d-block text-success">(Preview)</small>
+                                            }
+                                        </span>
+                                    </td>
+                                    hour += duration;
+                                }
+                                else
+                                {
+                                    <td></td>
+                                    hour++;
+                                }
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            // Initialize popovers
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl)
+            });
+        });
+
+        setTimeout(function () {
+            var alert = document.getElementById("alertMessage");
+            if (alert) {
+                alert.style.display = "none";
+            }
+        }, 3000); // 3 seconds
+    </script>
+}

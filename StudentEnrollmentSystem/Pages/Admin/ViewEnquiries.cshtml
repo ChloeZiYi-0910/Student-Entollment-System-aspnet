@@ -1,0 +1,82 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Admin.ViewEnquiriesModel
+@{
+    ViewData["Title"] = "View Student Enquiries";
+}
+<link rel="stylesheet" href="~/css/admin-table.css" />
+<div class="container mt-3">
+    <h1 class="text-center">Student Enquiries</h1>
+
+    @if (!Model.Enquiries.Any())
+    {
+        <div class="alert alert-info text-center">No enquiries found.</div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr class="thead-custom">
+                            <th scope="col" class="ps-4">User ID</th>
+                            <th scope="col">Problem</th>
+                            <th scope="col" class="text-end pe-4">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var enquiry in Model.Enquiries)
+                        {
+                            <tr class="clickable-row" data-href="@Url.Page("/Admin/EnquiryDetails", new { enquiryID = enquiry.EnquiryID })">
+                                <td class="ps-4">@enquiry.UserID</td>
+                                <td>@enquiry.Subject</td>
+                                <td class="text-end pe-4">
+                                    @if (enquiry.Responses.Any())
+                                    {
+                                        <span class="badge bg-success">Replied</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">Pending</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    <div class="text-center mt-4">
+        <a asp-page="/Admin/AdminHome" class="btn btn-outline-primary">Back to Dashboard</a>
+    </div>
+</div>
+
+<style>
+    .clickable-row {
+        cursor: pointer;
+    }
+
+        .clickable-row:hover {
+            background-color: #f8f9fa;
+        }
+
+    .thead-dark {
+        background-color: #343a40;
+        color: white;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.clickable-row').forEach(row => {
+            row.addEventListener('click', () => {
+                window.location = row.dataset.href;
+            });
+        });
+    </script>
+}

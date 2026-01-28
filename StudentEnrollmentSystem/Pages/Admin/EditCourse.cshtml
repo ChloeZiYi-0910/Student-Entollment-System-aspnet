@@ -1,0 +1,115 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Admin.EditCourseModel
+@{
+    ViewData["Title"] = "Edit Course";
+}
+
+<div class="container mt-3">
+    <h1 class="text-center">Edit Course: @Model.Course.CourseID</h1>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-info">@Model.Message</div>
+    }
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-@TempData["MessageType"]">@TempData["Message"]</div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                <input asp-for="Course.CourseID" type="hidden" />
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Course.CourseName" class="form-label">Course Name</label>
+                        <input asp-for="Course.CourseName" class="form-control" />
+                        <span asp-validation-for="Course.CourseName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Course.Lecturer" class="form-label">Lecturer</label>
+                        <input asp-for="Course.Lecturer" class="form-control" />
+                        <span asp-validation-for="Course.Lecturer" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="Course.CreditHours" class="form-label">Credit Hours</label>
+                        <input asp-for="Course.CreditHours" class="form-control" type="number" min="1" />
+                        <span asp-validation-for="Course.CreditHours" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Course.Major" class="form-label">Major</label>
+                        <select asp-for="Course.Major" class="form-select">
+                            <option value="">-- Select Major --</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Information Technology">Information Technology</option>
+                            <option value="Software Engineering">Software Engineering</option>
+                            <option value="Business Administration">Business Administration</option>
+                            <option value="Accounting">Accounting</option>
+                            <option value="Marketing">Marketing</option>
+                        </select>
+                        <span asp-validation-for="Course.Major" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="Course.Venue" class="form-label">Venue</label>
+                        <input asp-for="Course.Venue" class="form-control" />
+                        <span asp-validation-for="Course.Venue" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Course.DayOfWeek" class="form-label">Day of Week</label>
+                        <select asp-for="Course.DayOfWeek" class="form-select">
+                            <option value="">Select Day</option>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                        </select>
+                        <span asp-validation-for="Course.DayOfWeek" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="Course.StartTime" class="form-label">Start Time</label>
+                        <input asp-for="Course.StartTime" class="form-control" type="time" step="3600" min="08:00" max="18:00" oninput="this.value = this.value.slice(0,2) + ':00'" />
+                        <span asp-validation-for="Course.StartTime" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="Course.EndTime" class="form-label">End Time</label>
+                        <input asp-for="Course.EndTime" class="form-control" type="time" step="3600" min="08:00" max="18:00" oninput="this.value = this.value.slice(0,2) + ':00'" />
+                        <span asp-validation-for="Course.EndTime" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="Course.Section" class="form-label">Section</label>
+                        <input asp-for="Course.Section" class="form-control" />
+                        <span asp-validation-for="Course.Section" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="Course.TotalSeats" class="form-label">Total Seats</label>
+                        <input asp-for="Course.TotalSeats" type="number" min="1" class="form-control" />
+                        <span asp-validation-for="Course.TotalSeats" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Course.Cost" class="form-label">Cost</label>
+                        <input asp-for="Course.Cost" type="number" min="100" class="form-control" />
+                        <span asp-validation-for="Course.Cost" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-success me-4">Save Changes</button>
+                    <a asp-page="/Admin/ManageCourses" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

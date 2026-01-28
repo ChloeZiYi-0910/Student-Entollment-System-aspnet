@@ -1,0 +1,152 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Enrollment.AddDropCourseModel
+
+@if (!Model.IsEnrolled)
+{
+    <div class="modal fade show" id="enrolledModal" tabindex="-1" aria-labelledby="enrolledModalLabel" aria-hidden="true" style="display: block;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-custom text-white">
+                    <h5 class="modal-title" id="enrolledModalLabel">No Enrollment Detected</h5>
+                </div>
+                <div class="modal-body text-center">
+                    <h4>Please enroll in the current semester (@Model.CurrentSemester) first.</h4>
+                    <p>You will be redirected to the homepage in <span id="countdown">3</span> seconds...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container mt-5">
+        <h2 class="text-center">Add/Drop Courses - @Model.CurrentSemester</h2>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger">@Model.ErrorMessage</div>
+        }
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="alert alert-success">@Model.SuccessMessage</div>
+        }
+
+        @if (Model.AvailableCourses.Any())
+        {
+            <h3>Available Courses</h3>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="thead-dark text-center">
+                        <tr>
+                            <th>Course ID</th>
+                            <th>Name</th>
+                            <th>Credits</th>
+                            <th>Time</th>
+                            <th>Available Seats</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var course in Model.AvailableCourses)
+                        {
+                            var courseSchedule = course.DayOfWeek.Substring(0, 3) + " " + course.StartTime.ToString(@"hh\:mm") + "-" + course.EndTime.ToString(@"hh\:mm");
+                            <tr>
+                                <td>@course.CourseID</td>
+                                <td>@course.CourseName</td>
+                                <td class="text-center">@course.CreditHours</td>
+                                <td class="text-center">@courseSchedule</td>
+                                <td class="text-center">@course.AvailableSeats / @course.TotalSeats</td>
+                                <td class="text-center">
+                                    @if (course.AvailableSeats > 0 && !Model.PendingAddCourses.Contains(course.CourseID))
+                                    {
+                                        <form method="post" asp-page-handler="Add">
+                                            <input type="hidden" name="courseID" value="@course.CourseID" />
+                                            <div class="form-group d-flex align-items-center">
+                                                <input type="text" name="AddReason" class="form-control w-75 me-2" placeholder="Reason for adding" required />
+                                                <button type="submit" class="btn btn-primary btn-sm">Add</button>
+                                            </div>
+                                        </form>
+                                    }
+                                    else if (course.AvailableSeats <= 0)
+                                    {
+                                        <span class="badge bg-danger">Full</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">Pending Approval</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning text-center">
+                No available courses founded. Please contact admin for asist. <a asp-page="/Enquiry/ContactUs">Enquiry</a>
+            </div>
+        }
+        <h3>Enrolled Courses (Total Credits: @Model.TotalCreditHours / @Model.MaxCreditHours)</h3>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="thead-dark text-center">
+                    <tr>
+                        <th>Course ID</th>
+                        <th>Name</th>
+                        <th>Credits</th>
+                        <th>Time</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var course in Model.EnrolledCourses)
+                    {
+                        var courseSchedule = course.DayOfWeek.Substring(0, 3) + " " + course.StartTime.ToString(@"hh\:mm") + "-" + course.EndTime.ToString(@"hh\:mm");
+                        <tr>
+                            <td>@course.CourseID</td>
+                            <td>@course.CourseName</td>
+                            <td class="text-center">@course.CreditHours</td>
+                            <td class="text-center">@courseSchedule</td>
+                            <td class="text-center">
+                                @if (!Model.PendingDropCourses.Contains(course.CourseID))
+                                {
+                                    <form method="post" asp-page-handler="Drop">
+                                        <input type="hidden" name="courseID" value="@course.CourseID" />
+                                        <div class="form-group d-flex align-items-center">
+                                            <input type="text" name="DropReason" class="form-control w-75 me-2" placeholder="Reason for dropping" required />
+                                            <button type="submit" class="btn btn-danger btn-sm">Drop</button>
+                                        </div>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">Pending Approval</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-center mt-4">
+            <a asp-page="/Home" class="btn btn-outline-primary">Back to Home</a>
+        </div>
+    </div>
+}
+
+<style>
+    .bg-custom {
+        background-color: var(--main-color);
+    }
+
+    .thead-dark {
+        background-color: #343a40;
+        color: white;
+    }
+</style>
+
+<script src="/js/enrollment.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

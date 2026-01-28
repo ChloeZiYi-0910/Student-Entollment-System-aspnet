@@ -1,0 +1,18 @@
+﻿/*Contact Us Page Start*/
+h2.contactUs {
+    color: var(--main-color-hover) !important;
+    font-weight: 700;
+}
+
+input:hover, textarea:hover, select:hover {
+    background-color: #edededa3;
+}
+
+input:focus, textarea:focus, select:focus {
+    background-color: #ebf0fa69 !important;
+}
+
+textarea {
+    resize: vertical;
+}
+/*Contact Us Page End*/

@@ -1,0 +1,186 @@
+﻿/* wwwroot/css/timetable.css */
+
+/* General Layout */
+.container {
+    max-width: 1200px;
+}
+
+.card {
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 10px 15px;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+p {
+    margin-bottom: 0.75rem;
+}
+
+/*Print Timetable button*/
+.btn-print {
+    background-color: var(--main-color);
+    color: #ffffff;
+    border: 1px solid #ffffff;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    opacity: 1;
+    transition: all 0.2s ease-in-out;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+    .btn-print:hover {
+        background-color: #ffffff;
+        color: var(--main-color);
+    }
+
+.bg-custom {
+    background-color: var(--main-color) !important;
+}
+
+/*Table Design*/
+thead tr.thead-custom th {
+    background-color: #dde6f4 !important;
+    color: #244373 !important;
+}
+
+/* Highlight entire row when hovering over the first column (Days) */
+th.day-header:hover {
+    background-color: #f1f1f1;
+}
+
+    th.day-header:hover ~ td {
+        background-color: #f1f1f1;
+    }
+
+
+.timetable td:hover {
+    background-color: #edededa3 !important;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.timetable th, .timetable td {
+    padding: 0 5px !important;
+    width: 120px; /* Ensures uniform width */
+    height: 60px;
+}
+
+.timetable th{
+    background-color: #f1f1f1f2;
+}
+
+.timetable td {
+    border: 1px solid #e0e0e0;
+}
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .timetable-grid th,
+    .timetable-grid td {
+        min-width: 80px;
+        height: 60px;
+        font-size: 0.8rem;
+    }
+
+    .day-col {
+        width: 100px;
+    }
+
+    .course-info {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .row {
+        flex-direction: column;
+    }
+
+    .col-12 {
+        margin-bottom: 1rem;
+    }
+
+    .timetable-grid th,
+    .timetable-grid td {
+        min-width: 60px;
+        height: 50px;
+        font-size: 0.7rem;
+    }
+
+    .day-col {
+        width: 80px;
+    }
+}
+
+/*For Printing Timetable*/
+@media print {
+    body * {
+        visibility: hidden; /* Hide everything */
+    }
+
+    .student-info {
+        display: flex;
+        flex-direction: row; /* Left-Right Layout */
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        border-bottom: 1px solid black;
+        padding-bottom: 10px;
+    }
+
+    .info-left, .info-right {
+        width: 48%; /* Adjust for spacing */
+    }
+
+    .table, .table th, .table td {
+        border: 1px solid black !important;
+        color: black !important;
+        background: white !important;
+    }
+    #printSection, #printSection * {
+        visibility: visible; /* Show only the print section */
+    }
+
+    #printSection {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+
+    /* Black & White Styling */
+    body {
+        color: black;
+        background: white;
+    }
+
+    .table, .table th, .table td {
+        border: 1px solid black !important;
+        color: black !important;
+        background: white !important;
+    }
+
+    ul {
+        list-style-type: square;
+    }
+
+    h2, h3 {
+        text-align: center;
+        font-weight: bold;
+    }
+
+    button {
+        display: none; /* Hide print button */
+    }
+}

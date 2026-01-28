@@ -1,0 +1,62 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Admin.AdminHomeModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container mt-3">
+    <h1 class="text-center">Welcome, @HttpContext.Session.GetString("FullName")!</h1>
+    <p class="text-center">Admin Dashboard</p>
+
+    <div class="row mt-4 row-gap-3">
+        <div class="col-md-3">
+            <div class="card text-center shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Total Students</h5>
+                    <p class="card-text">@Model.TotalStudents</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Total Courses</h5>
+                    <p class="card-text">@Model.TotalCourses</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Requests</h5>
+                    <p class="card-text">@Model.PendingRequests</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Payments</h5>
+                    <p class="card-text">@Model.PendingPayments</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Student Enquiries</h5>
+                    <p class="card-text">@Model.PendingEnquiries</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a asp-page="/Admin/ManageCourses" class="btn btn-primary m-2">Manage Courses</a>
+        <a asp-page="/Admin/ViewEnrollments" class="btn btn-primary m-2">View Student Enrollments</a>
+        <a asp-page="/Admin/ApproveRequests" class="btn btn-primary m-2">Student Add/Drop Requests</a>
+        <a asp-page="/Admin/VerifyPayments" class="btn btn-primary m-2">Verify Payments</a>
+        <a asp-page="/Admin/ViewEnquiries" class="btn btn-primary m-2">Student Enquiries</a>
+        <a asp-page="/Account/Logout" class="btn btn-secondary m-2">Logout</a>
+    </div>
+</div>

@@ -1,0 +1,91 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Enquiry.StudentEvaluationModel
+@{
+    ViewData["Title"] = "Student Evaluation of Teaching";
+}
+
+<div class="container mt-3">
+    <h1 class="text-center mb-3">Student Evaluation of Teaching</h1>
+    @if (Model.EnrolledCoursesWithEvaluationStatus.Any())
+    {
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr class="thead-custom">
+                                <th scope="col" class="ps-4">Courses</th>
+                                <th scope="col">Section</th>
+                                <th scope="col">Semester</th>
+                                <th scope="col" class="text-end pe-4">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var course in Model.EnrolledCoursesWithEvaluationStatus)
+                            {
+                                var rowClass = course.IsCurrentSemester ? "clickable-row" : "";
+                                var rowHref = course.IsCurrentSemester
+                                ? Url.Page("/Enquiry/EvaluationDetails", new { enrollmentID = course.EnrollmentID })
+                                : "#";
+
+                                <tr class="@rowClass" data-href="@rowHref">
+                                    <td class="ps-4">@course.CourseID @course.CourseName - @course.Lecturer</td>
+                                    <td class="ps-4">@course.Section</td>
+                                    <td>@course.Semester</td>
+                                    <td class="text-end pe-4">
+                                        @if (course.Status == "Completed")
+                                        {
+                                            <span class="badge bg-success">Completed</span>
+                                        }
+                                        else if (course.Status == "Pending")
+                                        {
+                                            <span class="badge bg-warning">Pending</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            No enrollment records founded.
+        </div>
+    }
+</div>
+
+<style>
+    .clickable-row {
+        cursor: pointer;
+    }
+
+    tr:not(.clickable-row) {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+        .clickable-row:hover {
+            background-color: #f8f9fa;
+        }
+
+    .badge {
+        font-size: 0.9rem;
+    }
+
+    tr.thead-custom th{
+        background-color: #dde6f4 !important;
+        color: #244373 !important;
+    }
+</style>
+<script>
+    document.querySelectorAll('.clickable-row').forEach(row => {
+        row.addEventListener('click', () => {
+            window.location = row.dataset.href;
+        });
+    });
+
+</script>

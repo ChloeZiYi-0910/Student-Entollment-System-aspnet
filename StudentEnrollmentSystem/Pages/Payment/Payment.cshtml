@@ -1,0 +1,97 @@
+﻿@page "/Payment"
+@model StudentEnrollmentSystem.Pages.Payment.PaymentModel
+@{
+    ViewData["Title"] = "Make Payment";
+}
+
+<div class="card shadow-lg border-0">
+    <div class="card-header bg-primary text-white">
+        <h2 class="mb-0">Make Payment</h2>
+    </div>
+    <div class="card-body">
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger">@Model.ErrorMessage</div>
+        }
+
+        @if (Model.Invoices == null || !Model.Invoices.Any())
+        {
+            <div class="alert alert-warning">
+                No unpaid invoices found for your account. Please check your <a asp-page="/Payment/Invoice">invoices</a>.
+            </div>
+        }
+        else
+        {
+            <form method="post" asp-antiforgery="true">
+                <div class="mb-3">
+                    <label class="form-label">Select Invoice</label>
+                    <select name="invoiceId" id="invoiceId" class="form-select" required onchange="updateInvoiceDetails(this)">
+                        <option value="">-- Select an Invoice --</option>
+                        @foreach (var invoice in Model.Invoices)
+                        {
+                            <option value="@invoice.InvoiceID" data-total="@invoice.TotalAmount" data-paid="@invoice.PaidAmount" data-balance="@invoice.BalanceDue">
+                                Invoice #@invoice.InvoiceID - @invoice.Semester (Balance: @invoice.BalanceDue.ToString("C"))
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Total Amount</label>
+                    <input id="totalAmount" class="form-control" readonly />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Balance Due</label>
+                    <input id="balanceDue" class="form-control" readonly />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Payment Amount</label>
+                    <input asp-for="PaymentInput.Amount" class="form-control" />
+                    <span asp-validation-for="PaymentInput.Amount" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Payment Method</label>
+                    <select asp-for="PaymentInput.PaymentMethod" id="paymentMethod" class="form-select">
+                        <option value="">Select Payment Method</option>
+                        <option value="Credit Card">Credit Card</option>
+                        <option value="Debit Card">Debit Card</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                    </select>
+                    <span asp-validation-for="PaymentInput.PaymentMethod" class="text-danger"></span>
+                </div>
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary">Submit Payment</button>
+                    <a asp-page="/Payment/Invoice" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function updateInvoiceDetails(select) {
+            const selectedOption = select.options[select.selectedIndex];
+            const totalAmount = selectedOption.getAttribute('data-total');
+            const balanceDue = selectedOption.getAttribute('data-balance');
+
+            document.getElementById('totalAmount').value = totalAmount ? parseFloat(totalAmount).toFixed(2) : '';
+            document.getElementById('balanceDue').value = balanceDue ? parseFloat(balanceDue).toFixed(2) : '';
+            document.getElementById('PaymentInput_Amount').value = balanceDue ? parseFloat(balanceDue).toFixed(2) : '';
+        }
+
+        $(document).ready(function() {
+            $('form').submit(function(e) {
+                const balance = parseFloat($('#balanceDue').val());
+                const amount = parseFloat($('#PaymentInput_Amount').val());
+
+                if (amount > balance) {
+                    alert('Payment amount cannot exceed balance due');
+                    e.preventDefault();
+                    return false;
+                }
+                return true;
+            });
+        });
+    </script>
+}

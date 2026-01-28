@@ -1,0 +1,113 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.HomeModel
+@{
+    ViewData["Title"] = "Home";
+}
+@section Styles {
+    <style>
+        @Html.Raw(System.IO.File.ReadAllText("wwwroot/css/Home.css"))
+    </style>
+}
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+@* <div class="text-center">
+    <h1 class="display-4 fw-bold mb-3" style="color:#000080">Welcome, @Model.FullName!</h1>
+    <p class="lead">Manage your courses with ease.</p>
+</div> *@
+<section class="container pt-3 mb-3">
+    <div class="row pt-5 mt-30">
+        <div class="col-lg-4 col-sm-6 mb-30 pb-5">
+            <div class="card" href="#">
+                <div class="box-shadow bg-white rounded-circle mx-auto text-center" style="width: 90px; height: 90px; margin-top: -45px;"><i class="fa fa-user fa-3x head-icon"></i></div>
+                <div class="card-body text-center">
+                    <h2 class="card-title pt-1">Enrolment</h2><br />
+                    <a asp-page="/Enrollment/CourseEnrollment">Course Enrolment</a><br /><br /><br />
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 mb-30 pb-5">
+            <div class="card" href="#">
+                <div class="box-shadow bg-white rounded-circle mx-auto text-center" style="width: 90px; height: 90px; margin-top: -45px;"><i class="fa fa-user-plus fa-3x head-icon"></i></div>
+                <div class="card-body text-center">
+                    <h2 class="card-title pt-1">Add/Drop</h2><br />
+                    <a asp-page="/Enrollment/AddDropCourse">Add Drop Course</a><br />
+                    <a asp-page="/Enrollment/AddDropHistory">Add Drop History</a><br /><br />
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 mb-30 pb-5">
+            <div class="card" href="#">
+                <div class="box-shadow bg-white rounded-circle mx-auto text-center" style="width: 90px; height: 90px; margin-top: -45px;"><i class="fa fa-envelope fa-3x head-icon"></i></div>
+                <div class="card-body text-center">
+                    <h2 class="card-title pt-1">Enquiry</h2><br />
+                    <a asp-page="/Enquiry/ContactUs">Contact Us</a><br />
+                    <a asp-page="/Enquiry/TimetableMatching">Timetable Matching</a><br />
+                    <a asp-page="/Enquiry/StudentEvaluation">Student Evaluation of Teaching</a><br />
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 mb-30 pb-5">
+            <div class="card" href="#">
+                <div class="box-shadow bg-white rounded-circle mx-auto text-center" style="width: 90px; height: 90px; margin-top: -45px;"><i class="fa fa-file fa-3x head-icon"></i></div>
+                <div class="card-body text-center">
+                    <h2 class="card-title pt-1">Statement</h2><br />
+                    <a asp-page="/Enrollment/StudentStatement">Student Statement</a><br />
+                    <a asp-page="/Enrollment/Timetable">Class Timetable</a><br /><br />
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 mb-30 pb-5">
+            <div class="card" href="#">
+                <div class="box-shadow bg-white rounded-circle mx-auto text-center" style="width: 90px; height: 90px; margin-top: -45px;"><i class="fa fa-credit-card fa-3x head-icon"></i></div>
+                <div class="card-body text-center">
+                    <h2 class="card-title pt-1">Payment</h2><br />
+                    <a asp-page="/Payment/Payment">Payment</a><br />
+                    <a asp-page="/Payment/PaymentHistory">Payment History/Receipt</a><br />
+                    <a asp-page="/Payment/Invoice">Invoice and Adjustment Note</a><br />
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 mb-30 pb-5">
+            <div class="card" href="#">
+                <div class="box-shadow bg-white rounded-circle mx-auto text-center" style="width: 90px; height: 90px; margin-top: -45px;"><i class="fa fa-user-circle-o fa-3x head-icon"></i></div>
+                <div class="card-body text-center">
+                    <h2 class="card-title pt-1">Account</h2><br />
+                    <a asp-page="/AccountDetails/StudentDetails">Update Profile</a><br />
+                    <a asp-page="/AccountDetails/UpdateContactInformation">Update Contact Information</a><br />
+                    <a asp-page="/AccountDetails/UpdatePaymentDetails">Update Payment Details</a><br />
+                    <a asp-page="/AccountDetails/ChangePassword">Change Password</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@{
+    var username = TempData["Username"] as string; // Retrieve and remove after reading
+}
+
+@if (!string.IsNullOrEmpty(username))
+{
+    <div class="position-fixed top-0 start-50 translate-middle-x mt-4" style="z-index: 1050;">
+        <div id="welcomeToast" class="toast align-items-center bg-light text-dark border shadow-sm" role="alert" aria-live="polite" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body fw-bold">
+                    Welcome back, @username!
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var welcomeToast = document.getElementById("welcomeToast");
+            if (welcomeToast) {
+                var toast = new bootstrap.Toast(welcomeToast);
+                toast.show();
+            }
+        });
+    </script>
+
+    // Clear TempData after rendering
+    TempData.Remove("Username");
+}

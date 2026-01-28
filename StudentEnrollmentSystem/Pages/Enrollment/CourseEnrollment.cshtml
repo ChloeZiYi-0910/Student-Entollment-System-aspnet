@@ -1,0 +1,171 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Enrollment.CourseEnrollmentModel
+@{
+    ViewData["Title"] = "Course Enrollment";
+}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.css" rel="stylesheet">
+<style>
+    .bg-custom {
+    background-color: var(--main-color);
+    }
+
+    thead tr.thead-custom th {
+    background-color: #dde6f4 !important;
+    color: #244373 !important;
+    }
+</style>
+
+@if (!Model.IsEnrollmentPeriod || Model.IsEnrolled)
+{
+    <div class="modal fade show" id="enrolledModal" tabindex="-1" aria-labelledby="enrolledModalLabel" aria-hidden="true" style="display: block;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-custom text-white">
+                    <h5 class="modal-title" id="enrolledModalLabel">Enrollment Status</h5>
+                </div>
+                <div class="modal-body text-center">
+                    <h4>@((!Model.IsEnrollmentPeriod) ? "Enrollment is always open!" : "You have already enrolled for this semester.")</h4>
+                    <p>You will be redirected to the homepage in <span id="countdown">3</span> seconds...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card shadow-lg border-0 mt-3">
+        <div class="card-header bg-custom text-white text-center">
+            <h2 class="mb-0">Course Enrollment - @Model.GetCurrentSemester()</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Left Section -->
+                <div class="col-md-6">
+                    <p><strong>Date & Time:</strong> @DateTime.Now.ToString("dd MMM yyyy h:mm tt")</p>
+                    <p><strong>Matriculation No:</strong> @Model.StudentDetail?.StudentID</p>
+                    <p><strong>Student Name:</strong> @Model.StudentDetail?.FirstName @Model.StudentDetail?.LastName</p>
+                </div>
+                <!-- Right Section -->
+                <div class="col-md-6">
+                    <p><strong>Program:</strong> @Model.StudentDetail?.Program</p>
+                    <p>
+                        <strong>Total Credit Hours Enrolled:</strong>
+                        <span id="totalCredit">@Model.TotalCreditHours</span>/ @Model.MaxCreditHours
+                    </p>
+                </div>
+            </div>
+            <!-- Messages -->
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger text-center">
+                    @Model.ErrorMessage
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="alert alert-success text-center">
+                    @Model.SuccessMessage
+                </div>
+            }
+            <div class="mt-2 row">
+                <div class="col-md-4">
+                    <input type="text" id="searchCourse" class="form-control" placeholder="Search by Course Name or ID">
+                </div>
+                <div class="col-md-2">
+                    <select id="filterDay" class="form-control">
+                        <option value="">All Days</option>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="timeRangeStart">Start Time: <span id="startTimeLabel">08:00</span></label>
+                    <input type="range" id="timeRangeStart" min="8" max="18" step="1" value="8" class="form-control-range">
+                </div>
+                <div class="col-md-3">
+                    <label for="timeRangeEnd">End Time: <span id="endTimeLabel">18:00</span></label>
+                    <input type="range" id="timeRangeEnd" min="8" max="18" step="1" value="18" class="form-control-range">
+                </div>
+            </div>
+            <!-- Clear Filters Button -->
+            <div class="mb-4 d-flex justify-content-end">
+                <button id="clearFilters" class="btn btn-secondary">Clear Filters</button>
+            </div>
+            @if (Model.Courses.Any())
+            {
+                <form method="post">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="text-center">
+                                <tr class="thead-custom">
+                                    <th>Course ID</th>
+                                    <th>Course Name</th>
+                                    <th>Day</th>
+                                    <th>Time</th>
+                                    <th>Credits</th>
+                                    <th>Venue</th>
+                                    <th>Lecturer</th>
+                                    <th>Section</th>
+                                    <th>Available Seats</th>
+                                    <th>Select</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var course in Model.Courses)
+                                {
+                                    <tr class="course-row" data-course-id="@course.CourseID">
+                                        <td>@course.CourseID</td>
+                                        <td>@course.CourseName</td>
+                                        <td>@course.DayOfWeek</td>
+                                        <td>@course.StartTime.ToString("hh\\:mm") - @course.EndTime.ToString("hh\\:mm")</td>
+                                        <td>@course.CreditHours</td>
+                                        <td>@course.Venue</td>
+                                        <td>@course.Lecturer</td>
+                                        <td>@course.Section</td>
+                                        <td>@course.AvailableSeats / @course.TotalSeats</td>
+                                        <td class="text-center">
+                                            @if (Model.EnrolledCourseIDs.Contains(course.CourseID))
+                                            {
+                                                <input type="checkbox" disabled checked>
+                                            }
+                                            else if (course.AvailableSeats > 0)
+                                            {
+                                                <input type="checkbox" class="select-course" name="selectedCourses" value="@course.CourseID"
+                                                data-credits="@course.CreditHours" onchange="updateCreditHours()">
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">Full</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary mt-3 w-25">Enroll</button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="alert alert-warning text-center">
+                    No available courses founded. Please contact admin for asist. <a asp-page="/Enquiry/ContactUs">Enquiry</a>
+                </div>
+            }
+            <div class="text-center mt-4">
+                <a asp-page="/Home" class="btn btn-outline-primary">Back to Home</a>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- JavaScript to auto-close modal and redirect -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/js/enrollment.js"></script>

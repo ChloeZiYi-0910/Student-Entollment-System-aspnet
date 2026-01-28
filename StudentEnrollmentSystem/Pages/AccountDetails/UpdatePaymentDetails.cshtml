@@ -1,0 +1,216 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.AccountDetails.UpdatePaymentDetailsModel
+@{
+    ViewData["Title"] = "Update Payment Details";
+}
+
+<link rel="stylesheet" href="~/css/AccountDetails.css">
+<div class="container light-style flex-grow-1 container-p-y">
+    <h4 class="font-weight-bold py-3 mb-4">Account Settings</h4>
+    <div class="card overflow-hidden">
+        <div class="row no-gutters row-bordered row-border-light">
+            <div class="col-md-3 pt-0">
+                <div class="list-group list-group-flush account-settings-links">
+                    <a class="list-group-item list-group-item-action" asp-page="/AccountDetails/StudentDetails">General Information</a>
+                    <a class="list-group-item list-group-item-action" asp-page="/AccountDetails/UpdateContactInformation">Update Contact Information</a>
+                    <a class="list-group-item list-group-item-action active" asp-page="/AccountDetails/UpdatePaymentDetails">Update Payment Details</a>
+                    <a class="list-group-item list-group-item-action" asp-page="/AccountDetails/ChangePassword">Change Password</a>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="tab-content">
+                    <div class="tab-pane fade active show">
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data">
+                                <div class="form-group mb-3">
+                                    <label class="form-label mb-0">Bank Name</label>
+                                    <select class="form-select" asp-for="PaymentDetails.BankName" id="bankname">
+                                        <option value="" selected disabled>Select Bank</option>
+                                        <option value="ABB" id="abb">ABB: AFFIN BANK BERHAD</option>
+                                        <option value="ABM" id="abm">ABM: ALLIANCE BANK MALAYSIA</option>
+                                        <option value="AMB" id="amb">AMB: AMBANK BERHAD</option>
+                                        <option value="BBB" id="bbb">BBB: BANGKOK BANK BERHAD</option>
+                                        <option value="BIMB" id="bimb">BIMB: BANK ISLAM MALAYSIA BERHAD</option>
+                                        <option value="BMMB" id="bmmb">BMMB: BANK MUAMALAT MALAYSIA BERHAD</option>
+                                        <option value="BNS" id="bns">BNS: THE BANK OF NOVA SCOTIA BERHAD</option>
+                                        <option value="BR" id="br">BR: BANK RAKYAT</option>
+                                        <option value="BSNL" id="bsnl">BSNL: BANK SIMPANAN NASIONAL</option>
+                                        <option value="CIMB" id="cimb">CIMB: CIMB BANK</option>
+                                        <option value="CITI" id="citi">CITI: CITIBANK</option>
+                                        <option value="DBMB" id="dbmb">DBMB: DEUTSCHE BANK(MALAYSIA) BERHAD</option>
+                                        <option value="HLB" id="hlb">HLB: HONG LEONG BANK BHD</option>
+                                        <option value="HSBC" id="hsbc">HSBC: HSBC BANK MALAYSIA BERHAD</option>
+                                        <option value="IIB" id="iib">IIB: INDIA INTERNATIONAL BANK MALAYSIA</option>
+                                        <option value="MBB" id="mbb">MBB: MAYBANK BERHAD</option>
+                                        <option value="OCBC" id="ocbc">OCBC: OCBC BANK MALAYSIA BERHAD</option>
+                                        <option value="PBB" id="pbb">PBB: PUBLIC BANK BERHAD</option>
+                                        <option value="RHB" id="rhb">RHB: RHB BANK BERHAD</option>
+                                        <option value="SCB" id="scb">SCB: STANDARD CHARTERED BANK BERHAD</option>
+                                        <option value="UOB" id="uob">UOB: UNITED OVERSEAS BANK</option>
+                                    </select>
+                                    <span asp-validation-for="PaymentDetails.BankName" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label mb-0">Bank Account No.</label>
+                                    <input type="text" class="form-control" asp-for="PaymentDetails.CardAccNo" id="bankaccno">
+                                    <span asp-validation-for="PaymentDetails.CardAccNo" class="text-danger"></span>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label mb-0">Bank Holder Name</label>
+                                    <input type="text" class="form-control" asp-for="PaymentDetails.CardHolderName" id="bankholdername">
+                                    <span asp-validation-for="PaymentDetails.CardHolderName" class="text-danger"></span>
+                                </div>
+                                <div class="row">
+                                    <div class="column">
+                                        <div class="form-group mb-3">
+                                            <label class="form-label mb-0">Expiry Date (MM/YY)</label>
+                                            <input type="text" class="form-control" asp-for="PaymentDetails.ExpiryDate" id="expirydate">
+                                            <span asp-validation-for="PaymentDetails.ExpiryDate" id="expirydate-validation" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label mb-0">Upload Doc for Account Verification (Optional)</label>
+                                    <div class="mb-0">
+                                        <input class="form-control" type="file" id="cardDocument" name="CardDocumentFile" accept="image/jpeg,image/png,image/gif">
+                                        <div class="text-secondary small mt-1">Allowed JPG, GIF or PNG. Max size of 800K</div>
+                                    </div>
+                                    <input type="hidden" asp-for="PaymentDetails.UserID">
+
+                                    @if (!string.IsNullOrEmpty(Model.PaymentDetails.CardDOC))
+                                    {
+                                        <div class="mt-2">
+                                            <p>Current document: @Model.PaymentDetails.CardDOC</p>
+                                            <img src="~/uploads/@Model.PaymentDetails.CardDOC" alt="Bank Document" style="max-width: 200px; max-height: 200px;" />
+                                        </div>
+                                    }
+
+                                    @if (Model.PaymentDetails.PaymentDocumentHistories.Any())
+                                    {
+                                        <div class="mt-2">
+                                            <h6>Document History</h6>
+                                            <ul>
+                                                @foreach (var doc in Model.PaymentDetails.PaymentDocumentHistories)
+                                                {
+                                                    <li>@doc.FilePath (Uploaded: @doc.UploadDate.ToString("d"))</li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrEmpty(Model.Errormessage))
+                                    {
+                                        <div class="alert alert-danger mt-2">
+                                            @Model.Errormessage
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                                    {
+                                        <div class="alert alert-success mt-2">
+                                            @Model.SuccessMessage
+                                        </div>
+                                    }
+                                </div>
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button type="submit" class="btn btn-primary me-4">Save changes</button>
+                                    @if (!string.IsNullOrEmpty(HttpContext.Session.GetString("PaymentFlow")))
+                                    {
+                                        <a asp-page="/Payment/Payment" class="btn btn-outline-success">Back to Payment</a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-page="/Home" class="btn btn-back btn-outline-success">Back to Home</a>
+                                    }
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const fileInput = document.getElementById('cardDocument');
+        const expiryInput = document.getElementById('expirydate');
+        const expiryValidationSpan = document.getElementById('expirydate-validation');
+
+        // File validation
+        fileInput.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                if (this.files[0].size > 800 * 1024) {
+                    alert('File size must be less than 800KB');
+                    this.value = '';
+                    return;
+                }
+
+                const fileType = this.files[0].type;
+                if (fileType !== 'image/jpeg' && fileType !== 'image/png' && fileType !== 'image/gif') {
+                    alert('Only JPG, PNG, and GIF files are allowed');
+                    this.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    let previewContainer = document.getElementById('imagePreview');
+                    if (!previewContainer) {
+                        previewContainer = document.createElement('div');
+                        previewContainer.id = 'imagePreview';
+                        previewContainer.className = 'mt-2';
+                        fileInput.parentNode.appendChild(previewContainer);
+                    }
+
+                    previewContainer.innerHTML = `
+                        <p>Preview:</p>
+                        <img src="${e.target.result}" alt="Image Preview" style="max-width: 200px; max-height: 200px;" />
+                    `;
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        // Expiry date validation
+        expiryInput.addEventListener('blur', function () {
+            validateExpiryDate(this, expiryValidationSpan);
+        });
+
+        function validateExpiryDate(inputElement, validationSpan) {
+            const expiryValue = inputElement.value.trim();
+
+            validationSpan.textContent = '';
+            validationSpan.classList.remove('field-validation-error');
+
+
+            const parts = expiryValue.split('/');
+            const month = parseInt(parts[0], 10);
+            const year = parseInt(parts[1], 10) + 2000; // Convert to 4-digit year
+
+            if (month < 1 || month > 12 || isNaN(year)) {
+                validationSpan.textContent = 'Invalid month or year';
+                validationSpan.classList.add('field-validation-error');
+                return false;
+            }
+
+            const today = new Date();
+            const expiryDate = new Date(year, month, 0); // Last day of expiry month
+
+            if (expiryDate < today) {
+                validationSpan.textContent = 'Cannot enter expired card.';
+                validationSpan.classList.add('field-validation-error');
+                return false;
+            }
+
+            return true;
+        }
+    });
+</script>
+
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>

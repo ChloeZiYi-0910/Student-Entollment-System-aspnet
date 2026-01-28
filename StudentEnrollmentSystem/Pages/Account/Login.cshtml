@@ -1,0 +1,66 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-4">Login</h2>
+                <form method="post">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" asp-for="UserID">User ID</label>
+                        <input asp-for="UserID" class="form-control" id="userID" required autofocus />
+                        <span asp-validation-for="UserID" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" asp-for="Password">Password</label>
+                        <input asp-for="Password" type="password" class="form-control" id="password" required />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <input type="checkbox" id="toggle-password"> Show Password
+                    </div>
+                    @if (!ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">Invalid login.</div>
+                    }
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success">
+                            @TempData["SuccessMessage"]
+                        </div>
+                    }
+                    @if (TempData["LogoutMessage"] != null)
+                    {
+                        <div class="alert alert-primary">
+                            @TempData["LogoutMessage"]
+                        </div>
+                    }
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+                <div class="text-center mt-3">
+                    <p>Forgot Your Password? <a asp-page="/Account/ForgotPassword">Reset Your Password Here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const passwordInput = document.getElementById('password');
+            const togglePasswordCheckbox = document.getElementById('toggle-password');
+
+            if (passwordInput && togglePasswordCheckbox) {
+                togglePasswordCheckbox.addEventListener('change', function () {
+                    passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+                });
+            }
+        });
+    </script>
+}

@@ -1,0 +1,111 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Payment.InvoiceModel
+@{
+    ViewData["Title"] = "Invoices";
+}
+
+<link rel="stylesheet" href="~/css/print-invoice.css" />
+
+<div class="card shadow-lg border-0">
+    <div class="card-header bg-primary text-white">
+        <h2 class="mb-0">Your Invoices</h2>
+    </div>
+    <div class="card-body">
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger">@Model.ErrorMessage</div>
+        }
+
+        @if (Model.Invoices != null && Model.Invoices.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Invoice #</th>
+                            <th>Semester</th>
+                            <th>Total</th>
+                            <th>Paid</th>
+                            <th>Balance</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var invoice in Model.Invoices)
+                        {
+                            <tr>
+                                <td>@invoice.InvoiceID</td>
+                                <td>@invoice.Semester</td>
+                                <td>@invoice.TotalAmount.ToString("C")</td>
+                                <td>@invoice.PaidAmount.ToString("C")</td>
+                                <td>@invoice.BalanceDue.ToString("C")</td>
+                                <td>
+                                    <span class="badge @GetStatusBadgeClass(invoice.Status)">
+                                        @invoice.Status
+                                    </span>
+                                </td>
+                                <td>
+                                    <a asp-page="/Payment/Payment"
+                                       asp-route-invoiceId="@invoice.InvoiceID"
+                                       class="btn btn-sm btn-primary @(invoice.BalanceDue <= 0 ? "disabled" : "")">
+                                        Pay Now
+                                    </a>
+                                    <button class="btn btn-sm btn-secondary print-invoice-btn"
+                                            onclick="printInvoice(@invoice.InvoiceID, '@invoice.Semester', '@invoice.TotalAmount.ToString("C")', '@invoice.PaidAmount.ToString("C")', '@invoice.BalanceDue.ToString("C")', '@invoice.Status')">
+                                        Print Invoice
+                                    </button>
+                                </td>
+                            </tr>
+                            <!-- Print template for this specific invoice -->
+                            <div id="invoiceTemplate-@invoice.InvoiceID" class="print-invoice" style="display: none;">
+                                <h2>Invoice</h2>
+                                <p><strong>Student Name:</strong> @HttpContext.Session.GetString("FullName")</p>
+                                <p><strong>Student ID:</strong> @Model.StudentID</p>
+                                <p><strong>Invoice Number:</strong> @invoice.InvoiceID</p>
+                                <p><strong>Semester:</strong> @invoice.Semester</p>
+                                <p><strong>Total Amount:</strong> @invoice.TotalAmount.ToString("C")</p>
+                                <p><strong>Paid Amount:</strong> @invoice.PaidAmount.ToString("C")</p>
+                                <p><strong>Balance Due:</strong> @invoice.BalanceDue.ToString("C")</p>
+                                <p><strong>Status:</strong> @invoice.Status</p>
+                                <hr />
+                                <p>Student Enrollment System © 2025</p>
+                            </div>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                No invoices found for your account.
+            </div>
+        }
+    </div>
+</div>
+
+@functions {
+    public string GetStatusBadgeClass(string status)
+    {
+        return status switch
+        {
+            "Paid" => "bg-success",
+            "Partially Paid" => "bg-info",
+            "Pending" => "bg-warning",
+            "Overdue" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}
+
+@section Scripts {
+    <script>
+        function printInvoice(invoiceId, semester, total, paid, balance, status) {
+            const template = document.getElementById('invoiceTemplate-' + invoiceId);
+            template.style.display = 'block';
+            window.print();
+            template.style.display = 'none';
+        }
+    </script>
+}

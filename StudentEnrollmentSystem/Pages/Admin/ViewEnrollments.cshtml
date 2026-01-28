@@ -1,0 +1,131 @@
+﻿@page "{studentID?}"
+@model StudentEnrollmentSystem.Pages.Admin.ViewEnrollmentsModel
+@{
+    ViewData["Title"] = Model.SelectedStudent == null ? "View Enrollments" : $"Enrollment Details - {Model.SelectedStudent.FirstName} {Model.SelectedStudent.LastName}";
+}
+<link rel="stylesheet" href="~/css/admin-table.css" />
+<div class="container mt-3">
+    @if (Model.SelectedStudent == null)
+    {
+        <h1 class="text-center">View Enrollments by Student</h1>
+
+        @if (!Model.Students.Any())
+        {
+            <p class="text-center">No students found.</p>
+        }
+        else
+        {
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr class="thead-custom">
+                                    <th>Student ID</th>
+                                    <th>Student Name</th>
+                                    <th>Total Courses</th>
+                                    <th>Total Credit Hours</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var student in Model.Students)
+                                {
+                                    <tr>
+                                        <td>@student.StudentID</td>
+                                        <td>@student.LastName @student.FirstName</td>
+                                        <td>@student.TotalCourses</td>
+                                        <td>@student.TotalCreditHours</td>
+                                        <td>
+                                            <a asp-page="/Admin/ViewEnrollments" asp-route-studentID="@student.StudentID" class="btn btn-primary btn-sm">View Details</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <h1 class="text-center mb-4">Enrollment Details</h1>
+
+        @if (Model.SelectedStudent == null)
+        {
+            <div class="alert alert-danger text-center">Student not found.</div>
+        }
+        else
+        {
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-custom text-white">
+                    <h5 class="mb-0">@Model.SelectedStudent.LastName @Model.SelectedStudent.FirstName (ID: @Model.SelectedStudent.StudentID)</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Total Courses</dt>
+                        <dd class="col-sm-9">@Model.SelectedStudent.TotalCourses</dd>
+                        <dt class="col-sm-3">Total Credit Hours</dt>
+                        <dd class="col-sm-9">@Model.SelectedStudent.TotalCreditHours</dd>
+                    </dl>
+
+                    <h5 class="mt-4">Enrolled Courses</h5>
+                    @if (!Model.Enrollments.Any())
+                    {
+                        <p>No enrollments found.</p>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Course ID</th>
+                                        <th>Course Name</th>
+                                        <th>Credit Hours</th>
+                                        <th>Last Action</th>
+                                        <th>Action Date</th>
+                                        <th>Semester</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var enrollment in Model.Enrollments)
+                                    {
+                                        <tr>
+                                            <td>@enrollment.CourseID</td>
+                                            <td>@enrollment.Course.CourseName</td>
+                                            <td>@enrollment.Course.CreditHours</td>
+                                            <td>@enrollment.LastAction</td>
+                                            <td>@(enrollment.ActionDate?.ToString("yyyy-MM-dd") ?? "N/A")</td>
+                                            <td>@enrollment.Semester</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+
+    <div class="text-center mt-4">
+        @if (Model.SelectedStudent != null)
+        {
+            <a asp-page="/Admin/ViewEnrollments" asp-route-studentID="" class="btn btn-secondary">Back to List</a>
+        }
+        <a asp-page="/Admin/AdminHome" class="btn btn-outline-primary">Back to Dashboard</a>
+    </div>
+</div>
+
+<style>
+    .thead-dark {
+        background-color: #343a40;
+        color: white;
+    }
+
+    .card-header {
+        background-color: #007bff;
+    }
+</style>

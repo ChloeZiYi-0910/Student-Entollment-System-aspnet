@@ -1,0 +1,174 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Student Enrollment System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    @RenderSection("Styles", required: false)
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <header>
+        @functions {
+            string IsActive(string page)
+            {
+                var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
+                return currentPage == page ? "active" : "";
+            }
+        }
+        <nav class="navbar navbar-expand-lg bg-gradient shadow-sm">
+            <div class="container-fluid">
+                @if (Context.Session.GetString("UserID") != null)
+                {
+                    var role = Context.Session.GetString("Role");
+                    //Admin and Student will be redirected to different home page
+                    if (role == "Admin") 
+                    {
+                        <a class="navbar-brand fw-bold" href="/Admin/AdminHome">Enrollment System</a>
+                    }
+                    else
+                    {
+                        <a class="navbar-brand fw-bold" href="/Home">Enrollment System</a>
+                    }
+                }
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="material-symbols-rounded">menu</span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        @if (Context.Session.GetString("UserID") != null)
+                        {
+                            var role = Context.Session.GetString("Role");
+                            if (role == "Admin")
+                            {
+                                <!-- Inside Admin role section -->
+                                <li class="nav-item">
+                                    <a class="nav-link @IsActive("/Admin/AdminHome")" asp-page="/Admin/AdminHome">Dashboard</a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle @IsActive("/Admin/ApproveRequests") @IsActive("/Admin/ViewEnrollments") @IsActive("/Admin/VerifyPayments")" role="button" data-bs-toggle="dropdown">Enrollments Related</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item @IsActive("/Admin/ApproveRequests")" asp-page="/Admin/ApproveRequests">Add/Drop Requests</a></li>
+                                        <li><a class="dropdown-item @IsActive("/Admin/ViewEnrollments")" asp-page="/Admin/ViewEnrollments">Student Enrollments</a></li>
+                                        <li><a class="dropdown-item @IsActive("/Admin/VerifyPayments")" asp-page="/Admin/VerifyPayments">Verify Payments</a></li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle @IsActive("/Admin/ManageCourses") @IsActive("/Admin/ManageStudents")" role="button" data-bs-toggle="dropdown">Manage</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item @IsActive("/Admin/ManageCourses")" asp-page="/Admin/ManageCourses">Courses</a></li>
+                                        <li><a class="dropdown-item @IsActive("/Admin/ManageStudents")" asp-page="/Admin/ManageStudents">Students</a></li>
+                                        <li><a class="dropdown-item @IsActive("/Admin/ManageAdmins")" asp-page="/Admin/ManageAdmins">Admins</a></li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @IsActive("/Admin/ViewEnquiries")" asp-page="/Admin/ViewEnquiries">View Enquiries</a>
+                                </li>
+                            }
+                            else if (role == "Student")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @IsActive("/Home")" asp-page="/Home">Home</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @IsActive("/Enrollment/CourseEnrollment")" asp-page="/Enrollment/CourseEnrollment">Course Enrollment</a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle @IsActive("/Enrollment/AddDropCourse") @IsActive("/Enrollment/AddDropHistory")" role="button" data-bs-toggle="dropdown">Add/Drop</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item @IsActive("/Enrollment/AddDropCourse")" asp-page="/Enrollment/AddDropCourse">Add/Drop Course</a></li>
+                                        <li><a class="dropdown-item @IsActive("/Enrollment/AddDropHistory")" asp-page="/Enrollment/AddDropHistory">Add/Drop History</a></li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle @IsActive("/Enrollment/Timetable") @IsActive("/Enrollment/StudentStatement")" role="button" data-bs-toggle="dropdown">Statement</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item @IsActive("/Enrollment/StudentStatement")" asp-page="/Enrollment/StudentStatement">Student Statement</a></li>
+                                        <li><a class="dropdown-item @IsActive("/Enrollment/Timetable")" asp-page="/Enrollment/Timetable">Timtable</a></li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle @IsActive("/Payment/Payment") @IsActive("/Payment/PaymentHistory") @IsActive("/Payment/Invoice")" role="button" data-bs-toggle="dropdown">Payment</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item @IsActive("/Payment/Payment")" asp-page="/Payment/Payment">Payment</a></li>
+                                        <li><a class="dropdown-item @IsActive("/Payment/PaymentHistory")" asp-page="/Payment/PaymentHistory">Payment History/Receipt</a></li>
+                                        <li><a class="dropdown-item @IsActive("/Payment/Invoice")" asp-page="/Payment/Invoice">Invoice and Adjustment Note</a></li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle @IsActive("/Enquiry/ContactUs") @IsActive("/Enquiry/TimetableMatching") @IsActive("/Enquiry/StudentEvaluation")" role="button" data-bs-toggle="dropdown">Enquiry</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item @IsActive("/Enquiry/ContactUs")" asp-page="/Enquiry/ContactUs">Contact Us</a></li>
+                                        <li><a class="dropdown-item @IsActive("/Enquiry/TimetableMatching")" asp-page="/Enquiry/TimetableMatching">Timetable/Matching</a></li>
+                                        <li><a class="dropdown-item @IsActive("/Enquiry/StudentEvaluation")" asp-page="/Enquiry/StudentEvaluation">Student Evaluation of Teaching</a></li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle @IsActive("/AccountDetails/StudentDetails") @IsActive("/AccountDetails/UpdateContactInformation") @IsActive("/AccountDetails/UpdatePaymentDetails") @IsActive("/AccountDetails/ChangePassword")" role="button" data-bs-toggle="dropdown">Account</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item @IsActive("/AccountDetails/StudentDetails")" asp-page="/AccountDetails/StudentDetails">Update Profile</a></li>
+                                        <li><a class="dropdown-item @IsActive("/AccountDetails/UpdateContactInformation")" asp-page="/AccountDetails/UpdateContactInformation">Update Contact Information</a></li>
+                                        <li><a class="dropdown-item @IsActive("/AccountDetails/UpdatePaymentDetails")" asp-page="/AccountDetails/UpdateBankDetails">Update Payment Details</a></li>
+                                        <li><a class="dropdown-item @IsActive("/AccountDetails/ChangePassword")" asp-page="/AccountDetails/ChangePassword">Change Password</a></li>
+                                    </ul>
+                                </li>
+                            }
+                        }
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        @if (Context.Session.GetString("UserID") != null)
+                        {
+                            var role = Context.Session.GetString("Role");
+                            @if (role == "Student")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link fw-bold @IsActive("/AccountDetails/StudentDetails") @IsActive("/AccountDetails/ChangePassword") @IsActive("/AccountDetails/UpdatePaymentDetails") @IsActive("/AccountDetails/UpdateContactInformation")" asp-page="/AccountDetails/StudentDetails">
+                                        @Context.Session.GetString("FullName")
+                                    </a>
+                                </li>
+                            }
+                            @if (role == "Admin")
+                            {
+                                <li class="nav-item">
+                                    <span class="nav-link fw-bold">Admin: @Context.Session.GetString("FullName")</span>
+                                </li>
+                            }
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center" asp-page="/Account/Logout">
+                                    <span class="material-symbols-rounded">logout</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Account/Login">Login</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container my-3 flex-grow-1">
+        @RenderBody()
+    </main>
+
+    <footer class="text-center py-3">
+        <p class="m-0">© 2025 Student Enrollment System. All rights reserved.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@3.2.12/dist/jquery.validate.unobtrusive.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,216 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Enrollment.TimetableModel
+@{
+    ViewData["Title"] = "Timetable";
+
+    // Define time slots from 08:00 to 18:00
+    var timeSlots = Enumerable.Range(8, 11).Select(hour => $"{hour}:00").ToList();
+
+    // Define darker text colors for courses (max 6 different courses)
+    var colors = new[] { "#0056b3", "#1e7e34", "#a71d2a", "#c69500", "#117a8b", "#4a148c" };
+
+    // Assign colors to courses dynamically
+    var courseColors = new Dictionary<string, string>();
+    int colorIndex = 0;
+}
+
+@section Styles {
+    <style>
+        @Html.Raw(System.IO.File.ReadAllText("wwwroot/css/Timetable.css"))
+    </style>
+}
+
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <h2>INTI International University</h2>
+        <p><strong>Date:</strong> @DateTime.Now.ToString("dd MMM yyyy")    <strong>Time:</strong> @DateTime.Now.ToString("h:mm tt")</p>
+    </div>
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success text-center">
+            @Model.SuccessMessage
+        </div>
+    }
+    <!-- Class Details -->
+    @if (Model.EnrolledCourses != null && Model.EnrolledCourses.Any())
+    {
+        <div class="card mb-4">
+            <div class="card-header bg-custom text-white d-flex justify-content-between">
+                <h4 class="mb-0">Enrolled Classes</h4>
+                <button class="btn btn-print" onclick="printTimetable()">Print Timetable</button>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr class="thead-custom">
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>Day</th>
+                            <th>Time</th>
+                            <th>Venue</th>
+                            <th>Lecturer</th>
+                            <th>Section</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var course in Model.EnrolledCourses)
+                        {
+                            <tr>
+                                <td>@course.CourseID</td>
+                                <td>@course.CourseName</td>
+                                <td>@course.DayOfWeek</td>
+                                <td>@course.StartTime.ToString("hh\\:mm") - @course.EndTime.ToString("hh\\:mm")</td>
+                                <td>@course.Venue</td>
+                                <td>@course.Lecturer</td>
+                                <td>@course.Section</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Timetable Grid -->
+        <div class="card mt-3">
+            <div class="card-header bg-custom text-white">
+                <h4 class="mb-0">Timetable</h4>
+            </div>
+            <div class="card-body">
+                <table class="table timetable table-bordered text-center align-middle">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            @foreach (var time in Model.TimeSlots)
+                            {
+                                <th>@time.ToString("hh\\:mm")</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var day in Model.DaysOfWeek)
+                        {
+                            <tr>
+                                <th class="fw-bold day-header">
+                                    @day
+                                </th>
+                                @for (int hour = 8; hour <= 18;)
+                                {
+                                    var course = Model.EnrolledCourses
+                                    .FirstOrDefault(c => c.DayOfWeek == day && c.StartTime.Hours == hour);
+
+                                    if (course != null)
+                                    {
+                                        int duration = (int)(course.EndTime.TotalHours - course.StartTime.TotalHours);
+
+                                        // Assign text color if not already assigned
+                                        if (!courseColors.ContainsKey(course.CourseID))
+                                        {
+                                            courseColors[course.CourseID] = colors[colorIndex % colors.Length];
+                                            colorIndex++;
+                                        }
+
+                                        <td colspan="@duration" class="text-center"
+                                            data-bs-toggle="popover"
+                                            data-bs-placement="right"
+                                            title="Course Details: @course.CourseID"
+                                            data-bs-content="Lecturer: @course.Lecturer Venue: @course.Venue"
+                                            style="cursor: pointer;text-align: justify !important;">
+                                            <span style="color: @courseColors[course.CourseID]; font-weight: bold;">
+                                                @course.CourseID - @course.Venue<br />
+                                                @course.CourseName
+                                            </span>
+                                        </td>
+                                        hour += duration; // Skip occupied hours
+                                    }
+                                    else
+                                    {
+                                        <td></td>
+                                        hour++; // Move to next hour slot
+                                    }
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            <p>No courses enrolled yet.</p>
+        </div>
+    }
+    <!-- Back Button -->
+    <div class="text-center mt-4">
+        <a asp-page="/Home" class="btn btn-outline-primary">Back to Home</a>
+    </div>
+</div>
+
+
+<!-- Hidden Print Section -->
+<div id="printSection" style="display: none;">
+    <h2 class="text-center">Student Enrollment Statement</h2>
+
+    <div class="student-info">
+        <div class="info-left">
+            <p><strong>Student Name:</strong> @Model.Student.LastName @Model.Student.FirstName</p>
+            <p><strong>Student ID:</strong> @Model.Student.StudentID</p>
+        </div>
+        <div class="info-right">
+            <p><strong>Program:</strong> @Model.Student.Program</p>
+            <p><strong>Personal Email:</strong> @Model.Student.PersonalEmail</p>
+            <p><strong>Instituition Email:</strong> @Model.Student.InstitutionalEmail</p>
+        </div>
+    </div>
+
+    <ul>
+        @foreach (var course in Model.EnrolledCourses)
+        {
+            <li><strong>@course.CourseID - @course.CourseName</strong>, taught by @course.Lecturer at @course.Venue</li>
+        }
+    </ul>
+
+    <h3 class="text-center">Class Timetable</h3>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Day</th>
+                @foreach (var time in Model.TimeSlots)
+                {
+                    <th>@time.ToString("hh\\:mm")</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var day in Model.DaysOfWeek)
+            {
+                <tr>
+                    <td><strong>@day</strong></td>
+                    @for (int hour = 8; hour <= 18;)
+                    {
+                        var course = Model.EnrolledCourses.FirstOrDefault(c => c.DayOfWeek == day && c.StartTime.Hours == hour);
+
+                        if (course != null)
+                        {
+                            int duration = (int)(course.EndTime.TotalHours - course.StartTime.TotalHours);
+                            <td colspan="@duration" class="text-center">
+                                <strong>@course.CourseID</strong><br>
+                                @course.Venue<br>
+                            </td>
+                            hour += duration; // Skip occupied hours
+                        }
+                        else
+                        {
+                            <td></td>
+                            hour++;
+                        }
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script src="~/js/enquiry.js"></script>

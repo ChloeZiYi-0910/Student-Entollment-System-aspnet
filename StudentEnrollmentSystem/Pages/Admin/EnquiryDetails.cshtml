@@ -1,0 +1,110 @@
+﻿@page "{enquiryID}"
+@model StudentEnrollmentSystem.Pages.Admin.EnquiryDetailsModel
+@{
+    ViewData["Title"] = $"Enquiry Details - {Model.Enquiry?.Subject ?? "Unknown"}";
+}
+<link rel="stylesheet" href="~/css/admin-table.css" />
+<div class="container mt-3">
+    <h1 class="text-center">Enquiry Details</h1>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+            @Model.Message
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+            @Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model.Enquiry == null)
+    {
+        <div class="alert alert-danger text-center">Enquiry not found.</div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-custom text-white d-flex justify-content-between align-items-center opacity-75">
+                <h5 class="mb-0">@Model.Enquiry.Subject</h5>
+                <span class="badge @(Model.Enquiry.Responses.Any() ? "bg-success" : "bg-warning")">
+                    @(Model.Enquiry.Responses.Any() ? "Replied" : "Pending")
+                </span>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">User ID</dt>
+                    <dd class="col-sm-9">@Model.Enquiry.UserID</dd>
+                    <dt class="col-sm-3">Student Name</dt>
+                    <dd class="col-sm-9">@Model.StudentFullName</dd>
+                    <dt class="col-sm-3">Category</dt>
+                    <dd class="col-sm-9">@Model.Enquiry.Category</dd>
+                    <dt class="col-sm-3">Message</dt>
+                    <dd class="col-sm-9">@Model.Enquiry.Message</dd>
+                    <dt class="col-sm-3">Created Date</dt>
+                    <dd class="col-sm-9">@Model.Enquiry.CreatedDate.ToString("yyyy-MM-dd HH:mm")</dd>
+                    @if (Model.Enquiry.EnquiryFiles?.Any() == true)
+                    {
+                        <dt class="col-sm-3">Attachments</dt>
+                        <dd class="col-sm-9">
+                            <ul class="list-unstyled">
+                                @foreach (var file in Model.Enquiry.EnquiryFiles)
+                                {
+                                    var fileName = file.FilePath.Split('/').Last();
+                                    <li><a href="@file.FilePath" target="_blank" class="text-primary">Download: @fileName</a></li>
+                                }
+                            </ul>
+                        </dd>
+                    }
+                </dl>
+
+                @if (Model.Enquiry.Responses?.Any() == true)
+                {
+                    <h5 class="mt-4">Responses</h5>
+                    <div class="list-group">
+                        @foreach (var response in Model.Enquiry.Responses)
+                        {
+                            <div class="list-group-item">
+                                <p class="mb-1">@response.Comment</p>
+                                <small class="text-muted">By @(response.User?.FullName ?? "Unknown") on @response.ResponseDate.ToString("yyyy-MM-dd HH:mm")</small>
+                            </div>
+                        }
+                    </div>
+                }
+
+                <h5 class="mt-4">Add Response</h5>
+                <form method="post" asp-page-handler="Respond" asp-route-enquiryID="@Model.Enquiry.EnquiryID">
+                    <div class="mb-3">
+                        <label class="form-label">Your Reply</label>
+                        <textarea class="form-control" asp-for="Comment" rows="4" required></textarea>
+                        <span class="text-danger" asp-validation-for="Comment"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Reply</button>
+                </form>
+            </div>
+        </div>
+    }
+
+    <div class="text-center mt-4">
+        <a asp-page="/Admin/ViewEnquiries" class="btn btn-outline-primary">Back to Enquiries</a>
+    </div>
+</div>
+
+<style>
+    .card-header {
+        background-color: #007bff;
+    }
+
+    .list-group-item {
+        border-left: 4px solid #28a745;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

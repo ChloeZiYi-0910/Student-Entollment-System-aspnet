@@ -1,0 +1,131 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Enrollment.StudentStatementModel
+@{
+    ViewData["Title"] = "Student Statement";
+}
+
+<link rel="stylesheet" href="~/css/print-statement.css" />
+
+<div class="card shadow-lg border-0">
+    <div class="card-header bg-primary text-white">
+        <h2 class="mb-0">Student Statement - University Fee</h2>
+    </div>
+    <div class="card-body">
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger">
+                @Model.ErrorMessage
+            </div>
+        }
+
+        <form method="get" class="mb-4">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">From Date</label>
+                    <input type="date" asp-for="FromDate" class="form-control" />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">To Date</label>
+                    <input type="date" asp-for="ToDate" class="form-control" />
+                </div>
+                <div class="col-md-4 d-flex align-items-end mb-3">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <a asp-page="/Enrollment/StudentStatement" class="btn btn-secondary ms-2">Reset</a>
+                </div>
+            </div>
+        </form>
+
+        <div class="print-statement-container" id="statementTemplate">
+            <div class="header">
+                <p><strong>INTI International University</strong></p>
+                <p>Registration No.: 202301012345 (987654-A)</p>
+                <h2>Student Statement - University Fee</h2>
+            </div>
+
+            <div class="student-details">
+                <div>
+                    <p><strong>Statement Date:</strong> @DateTime.Now.ToString("dd/MM/yyyy")</p>
+                    <p><strong>Student Name:</strong> @Model.StudentName</p>
+                    <p><strong>Intake Session:</strong> @Model.IntakeSession</p>
+                    <p><strong>Program:</strong> @Model.Program</p>
+                </div>
+                <div class="summary">
+                    <p><strong>Deposit:</strong> RM @Model.Deposit.ToString("N2")</p>
+                    <p><strong>Total Amount:</strong> RM @Model.TotalAmount.ToString("N2")</p>
+                    <p><strong>Current Month Due:</strong> RM @Model.CurrentMonthDue.ToString("N2")</p>
+                    <p><strong>Overdue Amount:</strong> RM @Model.OverdueAmount.ToString("N2")</p>
+                    <p><strong>Balance:</strong> RM @Model.Balance.ToString("N2")</p>
+                </div>
+            </div>
+
+            @if (Model.Transactions != null && Model.Transactions.Any())
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th>DATE</th>
+                            <th>PROCESS</th>
+                            <th>PARTICULARS</th>
+                            <th>DOCUMENT NO.</th>
+                            <th>SESSION</th>
+                            <th>AMOUNT DUE RM</th>
+                            <th>AMOUNT PAID RM</th>
+                            <th>TOTAL DUE/PAID RM</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var transaction in Model.Transactions)
+                        {
+                            <tr>
+                                <td>@transaction.Date.ToString("dd-MM-yy")</td>
+                                <td>@transaction.Process</td>
+                                <td>@transaction.Particulars</td>
+                                <td>@transaction.DocumentNo</td>
+                                <td>@transaction.Session</td>
+                                <td>@(transaction.AmountDue > 0 ? transaction.AmountDue.ToString("N2") : "-")</td>
+                                <td>@(transaction.AmountPaid > 0 ? transaction.AmountPaid.ToString("N2") : "-")</td>
+                                <td>@transaction.TotalDuePaid.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="no-transactions">No transactions found for the selected date range.</p>
+            }
+
+            <div class="summary-box">
+                <h4>Financial Summary</h4>
+                <p><strong>Total Invoiced:</strong> RM @Model.TotalAmount.ToString("N2")</p>
+                <p><strong>Total Paid:</strong> RM @((Model.TotalAmount - Model.Balance).ToString("N2"))</p>
+                <p><strong>Outstanding Balance:</strong> RM @Model.Balance.ToString("N2")</p>
+            </div>
+
+            <p class="balance"><strong>Balance - University Fee:</strong> RM @Model.Balance.ToString("N2")</p>
+
+            <div class="footer">
+                <p><strong>Date:</strong> @DateTime.Now.ToString("dd MMM yyyy")</p>
+                <p><strong>Time:</strong> @DateTime.Now.ToString("h:mm:ss tt")</p>
+                <p><strong>Program ID:</strong> @(Model.Transactions.FirstOrDefault()?.Session ?? "N/A")</p>
+                <p><strong>Page No:</strong> 1 of 1</p>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button class="btn btn-primary" onclick="printStatement()">Print Statement</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function printStatement() {
+            const template = document.getElementById('statementTemplate');
+            const originalDisplay = template.style.display;
+            template.style.display = 'block';
+            window.print();
+            template.style.display = originalDisplay;
+        }
+    </script>
+}

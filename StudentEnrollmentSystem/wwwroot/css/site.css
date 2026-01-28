@@ -1,0 +1,101 @@
+:root {
+    --text-color: #222222;
+    --bg-color: #ecf1f9;
+    --main-color: #4a7cc3;
+    --main-color-hover: #3969ad;
+}
+
+body {
+    background-color: var(--bg-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar {
+    transition: all 0.3s ease;
+    background-color: white;
+}
+
+.navbar-brand:hover {
+    color: var(--main-color) !important;
+}
+
+.nav-link {
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    font-weight:500;
+    margin: 0 10px;
+}
+
+    .nav-link:hover {
+        background-color: var(--bg-color);
+        color: var(--main-color-hover) !important;
+    }
+
+    .nav-link.active, .dropdown-item.active{
+        background-color: var(--bg-color) !important;
+        color: var(--main-color-hover) !important;
+    }
+
+.btn-primary {
+    background-color: var(--main-color);
+    border: none;
+    transition: transform 0.2s ease;
+}
+
+    .btn-primary:hover {
+        transform: scale(1.05);
+        background-color: var(--main-color-hover);
+    }
+
+.btn-success, .btn-danger {
+    transition: transform 0.2s ease;
+}
+
+    .btn-success:hover, .btn-danger:hover {
+        transform: scale(1.05);
+    }
+
+.table {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+    .table th, .table td {
+        vertical-align: middle;
+    }
+
+.alert {
+    border-radius: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+
+    .table {
+        font-size: 0.9rem;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Dropdown background color */
+.dropdown-menu {
+    background-color: #f8f9fa; /* Light gray */
+    border-radius: 8px; /* Rounded corners */
+    border: 1px solid rgba(0, 0, 0, 0.3); /* Remove border */
+}
+
+/* Dropdown item styling */
+.dropdown-item {
+    color: #333;
+    padding: 8px 10px;
+}
+
+    /* Hover effect */
+    .dropdown-item:hover {
+        background-color: var(--bg-color); /* Blue hover */
+        color: var(--main-color-hover);
+    }

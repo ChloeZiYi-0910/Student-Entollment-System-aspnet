@@ -1,0 +1,105 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Payment.BankTransferGatewayModel
+@{
+    ViewData["Title"] = "Bank Transfer Payment";
+}
+
+<div class="container my-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Bank Transfer Payment</h2>
+        </div>
+        <div class="card-body">
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger">
+                    @Model.ErrorMessage
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="alert alert-success">
+                    @Model.SuccessMessage
+                </div>
+            }
+
+            <form method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label">Transaction Date</label>
+                    <input type="date" class="form-control" asp-for="TransactionDate" required />
+                    <span asp-validation-for="TransactionDate" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Currency</label>
+                    <select class="form-select" asp-for="Currency" required>
+                        <option value="RM">RM</option>
+                        <!-- Add more currencies if needed -->
+                    </select>
+                    <span asp-validation-for="Currency" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Amount Paid</label>
+                    <input type="number" step="0.01" class="form-control" asp-for="TotalAmount" readonly />
+                    <span asp-validation-for="TotalAmount" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Reference No</label>
+                    <input type="text" class="form-control" asp-for="ReferenceNumber" readonly />
+                    <span asp-validation-for="ReferenceNumber" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Remarks</label>
+                    <textarea class="form-control" asp-for="Remarks" rows="3"></textarea>
+                    <span asp-validation-for="Remarks" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Upload Slip</label>
+                    <input type="file" class="form-control" id="proofFile" name="ProofFile" accept=".jpg,.jpeg,.bmp,.gif,.pdf" required />
+                    <div class="text-muted small mt-1">
+                        <span class="text-danger">jpg | jpeg | bmp | gif | pdf MAXIMUM FILE SIZE UPLOAD IS 1MB</span>
+                    </div>
+                    <span asp-validation-for="ProofFile" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Contact No</label>
+                    <input type="text" class="form-control" asp-for="ContactNo" required />
+                    <span asp-validation-for="ContactNo" class="text-danger"></span>
+                </div>
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary">UPLOAD</button>
+                    <a asp-page="/Payment/Payment" class="btn btn-secondary">CANCEL</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <footer class="text-center mt-4">
+        <p class="m-0">© 2025 INTI INTERNATIONAL UNIVERSITY & COLLEGES. ALL RIGHTS RESERVED.</p>
+    </footer>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('proofFile');
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    if (this.files[0].size > 1024 * 1024) { // 1MB = 1024 * 1024 bytes
+                        alert('File size must be less than 1MB');
+                        this.value = '';
+                        return;
+                    }
+
+                    const fileType = this.files[0].type;
+                    const allowedTypes = ['image/jpeg', 'image/bmp', 'image/gif', 'application/pdf'];
+                    if (!allowedTypes.includes(fileType)) {
+                        alert('Only JPG, JPEG, BMP, GIF, and PDF files are allowed');
+                        this.value = '';
+                        return;
+                    }
+                }
+            });
+        });
+    </script>
+}

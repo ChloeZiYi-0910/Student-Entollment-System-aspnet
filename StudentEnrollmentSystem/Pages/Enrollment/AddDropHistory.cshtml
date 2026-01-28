@@ -1,0 +1,46 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Enrollment.AddDropHistoryModel
+
+<div class="container mt-5">
+    <h2 class="text-center">Add/Drop Request History</h2>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+    else
+    {
+        <div class="card shadow-lg border-0">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Request ID</th>
+                                <th>Course ID</th>
+                                <th>Action</th>
+                                <th>Reason</th>
+                                <th>Request Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.History)
+                            {
+                                <tr>
+                                    <td>@item.RequestID</td>
+                                    <td>@item.CourseID</td>
+                                    <td>@item.Action</td>
+                                    <td>@item.Reason</td>
+                                    <td>@(item.RequestDate.HasValue ? item.RequestDate.Value.ToString("yyyy-MM-dd HH:mm") : "N/A")</td>
+                                    <td>@item.Status</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    }
+</div>

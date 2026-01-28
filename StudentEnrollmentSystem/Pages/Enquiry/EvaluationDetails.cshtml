@@ -1,0 +1,96 @@
+﻿@page "{enrollmentID}"
+@model StudentEnrollmentSystem.Pages.Enquiry.EvaluationDetailsModel
+@{
+    ViewData["Title"] = $"Student Evaluation of Teaching - {Model.CourseName}";
+}
+<style>
+    .btn-back{
+        color: white;
+        opacity: 0.8;
+        font-size: 1.75rem;
+    }
+
+    .btn-back:hover{
+        opacity: 1;
+    }
+
+    .bg-primary{
+        background-color: var(--main-color) !important;
+    }
+</style>
+<div class="container mt-1">
+    <h2 class="text-center mb-4">Evaluation for @Model.CourseName</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex align-items-center">
+            <a class="btn btn-back me-5 p-0" asp-page="/Enquiry/StudentEvaluation">
+                <i class="fa-solid fa-circle-chevron-left"></i>
+            </a>
+            <h5 class="mb-0">@Model.CourseName by @Model.Lecturer</h5>
+        </div>
+
+        <div class="card-body">
+            <form method="post">
+                <!-- Q1 -->
+                <div class="mb-4">
+                    <label class="form-label">
+                        Q1: Overall, I am satisfied with the teaching of this course or module by this lecturer. (@Model.Lecturer) <span class="text-danger">*</span>
+                    </label>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="me-2 text-muted small">Strongly Disagree</span>
+                        <div class="d-flex flex-grow-0 justify-content-between gap-4">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <div class="form-check form-check-inline mb-0">
+                                    <input class="form-check-input border-secondary" type="radio" asp-for="EvaluationResponse.Q1" id="Q1_@i" value="@i" />
+                                </div>
+                            }
+                        </div>
+                        <span class="ms-2 text-muted small">Strongly Agree</span>
+                    </div>
+                    <span class="text-danger" asp-validation-for="EvaluationResponse.Q1"></span>
+                </div>
+
+                <!-- Q2 -->
+                <div class="mb-4">
+                    <label for="Q2" class="form-label ">Q2: Please feel free to provide additional constructive feedback or comments to your lecturer. (@Model.Lecturer)
+                    </label>
+                    <textarea id="Q2" name="EvaluationResponse.Q2" class="form-control" rows="3" asp-for="EvaluationResponse.Q2"></textarea>
+                    <span class="text-danger" asp-validation-for="EvaluationResponse.Q2"></span>
+                </div>
+
+                <!-- Q3 -->
+                <div class="mb-4">
+                    <label class="form-label ">
+                        Q3: Overall, I am satisfied with this course or module. (@Model.CourseName) <span class="text-danger">*</span>
+                    </label>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="me-2 text-muted small">Strongly Disagree</span>
+                        <div class="d-flex flex-grow-0 justify-content-between gap-4">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <div class="form-check form-check-inline mb-0">
+                                    <input class="form-check-input border-secondary" type="radio" asp-for="EvaluationResponse.Q3" id="Q3_@i" value="@i" />
+                                </div>
+                            }
+                        </div>
+                        <span class="ms-2 text-muted small">Strongly Agree</span>
+                    </div>
+                    <span class="text-danger" asp-validation-for="EvaluationResponse.Q3"></span>
+                </div>
+
+                <!-- Q4 -->
+                <div class="mb-4">
+                    <label for="Q4" class="form-label ">Q4: In my opinion, the areas of this course or module that could be improved are... (@Model.CourseName) </label>
+                    <textarea id="Q4" name="EvaluationResponse.Q4" class="form-control" rows="3" asp-for="EvaluationResponse.Q4"></textarea>
+                    <span class="text-danger" asp-validation-for="EvaluationResponse.Q4"></span>
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-success px-4">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,68 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Enrollment.ApproveRequestsModel
+
+<link rel="stylesheet" href="~/css/admin-table.css" />
+<div class="container mt-3">
+    <h1 class="text-center">Approve Enrollment Requests - @Model.CurrentSemester</h1>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success">@Model.SuccessMessage</div>
+    }
+    <div class="card shadow-lg border-0">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="text-center">
+                        <tr class="thead-custom">
+                            <th>Request ID</th>
+                            <th>Student</th>
+                            <th>Course</th>
+                            <th>Action</th>
+                            <th>Reason</th>
+                            <th>Request Date</th>
+                            <th>Approve/Reject</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var request in Model.PendingRequests)
+                        {
+                            <tr>
+                                <td>@request.RequestID</td>
+                                <td>@request.StudentName</td>
+                                <td>@request.CourseName (@request.CourseID)</td>
+                                <td>@request.Action</td>
+                                <td>@request.Reason</td>
+                                <td>@request.RequestDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td class="text-center">
+                                    <form method="post" asp-page-handler="Approve" class="d-inline">
+                                        <input type="hidden" name="requestId" value="@request.RequestID" />
+                                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                    </form>
+                                    <form method="post" asp-page-handler="Reject" class="d-inline">
+                                        <input type="hidden" name="requestId" value="@request.RequestID" />
+                                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-4">
+        <a asp-page="/Home" class="btn btn-outline-primary">Back to Home</a>
+    </div>
+</div>
+
+<style>
+    .thead-dark {
+        background-color: #343a40 !important;
+        color: white;
+    }
+</style>

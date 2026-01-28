@@ -1,0 +1,120 @@
+﻿
+@page
+@model StudentEnrollmentSystem.Pages.Payment.PaymentHistoryModel
+@{
+    ViewData["Title"] = "Payment History";
+}
+
+<link rel="stylesheet" href="~/css/print-receipt.css" />
+
+<div class="card shadow-lg border-0">
+    <div class="card-header bg-primary text-white">
+        <h2 class="mb-0">Payment History</h2>
+    </div>
+    <div class="card-body">
+        <form method="get" class="mb-4">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">From Date</label>
+                    <input type="date" asp-for="FromDate" class="form-control" />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">To Date</label>
+                    <input type="date" asp-for="ToDate" class="form-control" />
+                </div>
+                <div class="col-md-4 d-flex align-items-end mb-3">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <a asp-page="/Payment/PaymentHistory" class="btn btn-secondary ms-2">Reset</a>
+                </div>
+            </div>
+        </form>
+
+        @if (Model.PaymentHistories.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Reference</th>
+                            <th>Status</th>
+                            <th>Receipt</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var payment in Model.PaymentHistories)
+                        {
+                            <tr>
+                                <td>@payment.PaymentDate.ToString("d")</td>
+                                <td>@payment.Amount.ToString("C")</td>
+                                <td>@payment.PaymentMethod</td>
+                                <td>@payment.Reference</td>
+                                <td>
+                                    <span class="badge @GetStatusBadgeClass(payment.Status)">
+                                        @payment.Status
+                                    </span>
+                                </td>
+                                <td>@payment.ReceiptNumber</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary print-receipt-btn"
+                                            onclick="printReceipt('@payment.ReceiptNumber', '@payment.PaymentDate.ToString("d")', '@payment.Amount.ToString("C")', '@payment.PaymentMethod', '@payment.Reference', '@payment.Status')">
+                                        Print Receipt
+                                    </button>
+                                </td>
+                            </tr>
+                            <!-- Print template for this specific receipt -->
+                            <div id="receiptTemplate-@payment.ReceiptNumber" class="print-receipt-container">
+                                <h2>Payment Receipt</h2>
+                                <p><strong>Student Name:</strong> @HttpContext.Session.GetString("FullName")</p>
+                                <p><strong>Student ID:</strong> @Model.StudentID</p>
+                                <p><strong>Receipt Number:</strong> @payment.ReceiptNumber</p>
+                                <p><strong>Date:</strong> @payment.PaymentDate.ToString("d")</p>
+                                <p><strong>Amount:</strong> @payment.Amount.ToString("C")</p>
+                                <p><strong>Payment Method:</strong> @payment.PaymentMethod</p>
+                                <p><strong>Reference:</strong> @payment.Reference</p>
+                                <p><strong>Status:</strong> @payment.Status</p>
+                                <hr />
+                                <p>Thank you for your payment!</p>
+                                <p>Student Enrollment System © 2025</p>
+                            </div>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                No payment history found.
+            </div>
+        }
+    </div>
+</div>
+
+@functions {
+    public string GetStatusBadgeClass(string status)
+    {
+        return status switch
+        {
+            "Completed" => "bg-success",
+            "Pending" => "bg-warning",
+            "Declined" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}
+
+@section Scripts {
+    <script>
+        function printReceipt(receiptNumber, date, amount, method, reference, status) {
+            // Show the specific receipt template and print
+            const template = document.getElementById('receiptTemplate-' + receiptNumber);
+            template.style.display = 'block';
+            window.print();
+            template.style.display = 'none';
+        }
+    </script>
+}

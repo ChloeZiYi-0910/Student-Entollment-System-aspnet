@@ -1,0 +1,63 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Payment.FakeGatewayModel
+@{
+    ViewData["Title"] = "Payment Gateway";
+}
+
+<div class="card shadow-lg border-0">
+    <div class="card-header bg-primary text-white">
+        <h2 class="mb-0">Payment Gateway</h2>
+    </div>
+    <div class="card-body">
+        @if (!string.IsNullOrEmpty(Model.ResponseMessage))
+        {
+            <div class="alert @(Model.PaymentStatus == "Completed" ? "alert-success" : "alert-danger")">
+                @Model.ResponseMessage
+            </div>
+        }
+
+        <form method="post">
+            <input type="hidden" asp-for="TotalAmount" />
+            <input type="hidden" asp-for="ReferenceNumber" />
+
+            <div class="mb-3">
+                <label class="form-label">Amount</label>
+                <input asp-for="TotalAmount" class="form-control" readonly />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Reference</label>
+                <input asp-for="ReferenceNumber" class="form-control" readonly />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Card Number</label>
+                <input asp-for="CardNumber" class="form-control" placeholder="Enter 16-digit card number" />
+                <span asp-validation-for="CardNumber" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Cardholder Name</label>
+                <input asp-for="CardHolderName" class="form-control" />
+                <span asp-validation-for="CardHolderName" class="text-danger"></span>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Expiry (MM/YY)</label>
+                    <input asp-for="ExpiryDate" class="form-control" placeholder="12/25" />
+                    <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">CVV</label>
+                    <input type="password" asp-for="CVV" class="form-control" placeholder="123" />
+                    <span asp-validation-for="CVV" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Process Payment</button>
+                <a asp-page="/Payment/Invoice" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

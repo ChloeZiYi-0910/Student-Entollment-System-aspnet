@@ -1,0 +1,86 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Admin.VerifyPaymentsModel
+@{
+    ViewData["Title"] = "Verify Payments";
+}
+
+<link rel="stylesheet" href="~/css/admin-table.css" />
+
+<div class="container mt-3">
+    <h1 class="text-center">Verify Payments</h1>
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">
+            @Model.ErrorMessage
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success">
+            @Model.SuccessMessage
+        </div>
+    }
+
+    <div class="card shadow-lg border-0">
+        <div class="card-body">
+            @if (Model.PendingPayments != null && Model.PendingPayments.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr class="thead-custom">
+                                <th>Payment ID</th>
+                                <th>Student ID</th>
+                                <th>Amount</th>
+                                <th>Payment Date</th>
+                                <th>Reference Number</th>
+                                <th>Status</th>
+                                <th>Proof File</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var payment in Model.PendingPayments)
+                            {
+                                <tr>
+                                    <td>@payment.PaymentID</td>
+                                    <td>@payment.StudentID</td>
+                                    <td>@payment.Amount.ToString("C")</td>
+                                    <td>@payment.PaymentDate.ToString("dd/MM/yyyy")</td>
+                                    <td>@payment.ReferenceNumber</td>
+                                    <td>@payment.Status</td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(payment.ProofFilePath))
+                                        {
+                                            <a href="/Uploads/@payment.ProofFilePath" target="_blank">View Proof</a>
+                                        }
+                                        else
+                                        {
+                                            <span>N/A</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <form method="post" asp-page-handler="Verify" asp-route-paymentId="@payment.PaymentID">
+                                            <button type="submit" class="btn btn-success">Verify</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    No pending payments to verify.
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a asp-page="/Admin/AdminHome" class="btn btn-outline-primary">Back to Dashboard</a>
+    </div>
+</div>

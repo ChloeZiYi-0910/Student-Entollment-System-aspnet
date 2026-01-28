@@ -1,0 +1,44 @@
+﻿/* wwwroot/css/print-receipt.css */
+.print-receipt-container {
+    display: none;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    .print-receipt-container, .print-receipt-container * {
+        visibility: visible;
+    }
+
+    .print-receipt-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        max-width: 500px; /* Narrower width for receipt */
+        margin: 0 auto;
+        font-family: 'Times New Roman', Times, serif; /* Different font */
+        border: 2px dashed #000; /* Different border style */
+        padding: 15px;
+        background-color: #f9f9f9; /* Light background */
+    }
+
+    h2 {
+        text-align: center;
+        color: #2c3e50; /* Darker color for header */
+        font-size: 24px;
+    }
+
+    p {
+        margin: 8px 0;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    hr {
+        margin: 15px 0;
+        border-top: 1px dotted #000; /* Dotted line for receipt */
+    }
+}

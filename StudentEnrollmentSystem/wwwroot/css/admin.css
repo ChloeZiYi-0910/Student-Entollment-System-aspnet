@@ -1,0 +1,39 @@
+﻿/* wwwroot/css/admin.css */
+.container {
+    max-width: 1200px;
+}
+
+.card {
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+}
+
+.card-header {
+    padding: 10px 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.bg-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.bg-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-outline-primary {
+    margin: 5px 0;
+    width: 80%;
+}
+
+@media (max-width: 768px) {
+    .btn-outline-primary {
+        width: 100%;
+    }
+}

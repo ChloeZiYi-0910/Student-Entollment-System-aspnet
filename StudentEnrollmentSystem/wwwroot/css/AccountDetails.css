@@ -1,0 +1,12 @@
+﻿.btn-back {
+    transition: transform 0.2s ease !important;
+}
+
+    .btn-back:hover {
+        transform: scale(1.05) !important;
+    }
+
+.list-group-item.active{
+    background-color: var(--main-color);
+    color: white;
+}

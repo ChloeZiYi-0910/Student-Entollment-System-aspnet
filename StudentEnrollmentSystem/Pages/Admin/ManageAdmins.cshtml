@@ -1,0 +1,163 @@
+﻿@page
+@model StudentEnrollmentSystem.Pages.Admin.ManageAdminsModel
+@{
+    ViewData["Title"] = "Manage Admins";
+}
+
+<link rel="stylesheet" href="~/css/admin-table.css" />
+<div class="container mt-3">
+    <h1 class="text-center">Manage Admins</h1>
+
+    @if (TempData["Message"] != null)
+    {
+        <div id="alertMessage" class="alert alert-@TempData["MessageType"] alert-dismissible fade show" role="alert">
+            @TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <h5>Validation Errors:</h5>
+            <ul>
+                @foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-danger">@Model.Message</div>
+    }
+
+    <!-- Add New Admin Form -->
+    <div class="card mb-4">
+        <div class="card-header bg-custom text-white">
+            <h4 class="mb-0">Add New Admin</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" asp-page-handler="Add">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label asp-for="NewAdmin.UserID" class="form-label">User ID</label>
+                        <input asp-for="NewAdmin.UserID" class="form-control" />
+                        <span asp-validation-for="NewAdmin.UserID" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="NewAdmin.FullName" class="form-label">Full Name</label>
+                        <input asp-for="NewAdmin.FullName" class="form-control" />
+                        <span asp-validation-for="NewAdmin.FullName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="NewAdmin.Password" class="form-label">Password</label>
+                        <input asp-for="NewAdmin.Password" type="password" class="form-control" />
+                        <span asp-validation-for="NewAdmin.Password" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row justify-content-end mt-4">
+                    <div class="col-md-3 d-flex align-items-end w-25">
+                        <button type="submit" class="btn btn-success w-100">Add Admin</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin List -->
+    <div class="card">
+        <div class="card-header bg-custom text-white">
+            <h4 class="mb-0">All Admins</h4>
+        </div>
+        <div class="card-body">
+            <div class="mb-2 row">
+                <div class="col-md-4">
+                    <input type="text" id="searchAdmin" class="form-control" placeholder="Search by User ID or Name">
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered custom-table">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Full Name</th>
+                            <th>Created Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var admin in Model.Admins)
+                        {
+                            <tr id="row-@admin.UserID">
+                                <td>@admin.UserID</td>
+                                <td>@admin.FullName</td>
+                                <td>@admin.CreatedDate.ToString("yyyy-MM-dd HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center mt-4">
+        <a asp-page="/Admin/AdminHome" class="btn btn-outline-primary">Back to Dashboard</a>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("searchAdmin");
+
+        searchInput.addEventListener("input", filterAdmins);
+
+        function filterAdmins() {
+            const searchValue = searchInput.value.toLowerCase();
+            const rows = document.querySelectorAll(".custom-table tbody tr");
+
+            rows.forEach(row => {
+                const userID = row.cells[0].textContent.toLowerCase();
+                const fullName = row.cells[1].textContent.toLowerCase();
+
+                const matchesSearch = userID.includes(searchValue) || fullName.includes(searchValue);
+
+                row.style.display = matchesSearch ? "" : "none";
+            });
+        }
+
+        setTimeout(function () {
+            var alertBox = document.getElementById("alertMessage");
+            if (alertBox) {
+                alertBox.classList.remove("show");
+                alertBox.classList.add("fade");
+            }
+        }, 5000);
+    });
+</script>
+
+<style>
+    .custom-table {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+        .custom-table td {
+            vertical-align: middle;
+        }
+
+    thead {
+        text-align: center;
+    }
+
+    .form-label {
+        font-weight: 500;
+    }
+</style>
